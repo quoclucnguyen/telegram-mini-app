@@ -1,14 +1,10 @@
+import { uploadFile } from "@/common/helper";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { useMainButton } from "@telegram-apps/sdk-react";
-import {
-  Button,
-  Input,
-  Modal,
-  Select,
-  Textarea,
-} from "@telegram-apps/telegram-ui";
-import { FC, useEffect } from "react";
+import { useBackButton, useMainButton } from "@telegram-apps/sdk-react";
+import { Input, Modal, Select, Textarea } from "@telegram-apps/telegram-ui";
+import { ImageUploader } from "antd-mobile";
+import { FC, useEffect, useState } from "react";
 import { z } from "zod";
 import { useCreateItemMutation } from "./service";
 
@@ -22,6 +18,20 @@ interface FormFields {
 export const ItemsPage: FC = () => {
   const mainButton = useMainButton();
   const createItemMutation = useCreateItemMutation();
+  const backButton = useBackButton();
+
+  const [openModal, setOpenModal] = useState(true);
+  const [imageUploadFile, setImageUploadFile] = useState<File | undefined>();
+
+  backButton.on("click", () => {
+    mainButton.hide();
+    mainButton.enable();
+  });
+
+  mainButton.on("click", () => {
+    console.log("click");
+    form.handleSubmit();
+  });
 
   const form = useForm<FormFields>({
     defaultValues: {
@@ -34,10 +44,28 @@ export const ItemsPage: FC = () => {
       mainButton.showLoader();
       mainButton.disable();
 
-      await createItemMutation.mutateAsync(value);
+      const bucket = "items";
+      let path = undefined;
+
+      if (imageUploadFile) {
+        const { path: resultPath } = await uploadFile(
+          imageUploadFile,
+          "items",
+          "images"
+        );
+
+        if (resultPath) {
+          path = resultPath;
+        }
+      }
+
+      await createItemMutation.mutateAsync({ ...value, bucket, path });
 
       mainButton.hideLoader();
       mainButton.enable();
+      mainButton.hide();
+      form.reset();
+      setOpenModal(false);
     },
   });
 
@@ -45,15 +73,10 @@ export const ItemsPage: FC = () => {
     mainButton.setText("Create item");
     mainButton.show();
     mainButton.enable();
-
-    mainButton.on("click", () => {
-      console.log("click");
-      form.handleSubmit();
-    });
   }, []);
 
   return (
-    <Modal trigger={<Button size="m">Open modal</Button>} open={true}>
+    <Modal open={openModal}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -123,6 +146,18 @@ export const ItemsPage: FC = () => {
             />
           )}
         </form.Field>
+
+        <div className="px-[22px] pt-[20px] pb-[16px]">
+          <ImageUploader
+            maxCount={1}
+            upload={async (file: File) => {
+              setImageUploadFile(file);
+              return {
+                url: URL.createObjectURL(file),
+              };
+            }}
+          />
+        </div>
       </form>
     </Modal>
   );

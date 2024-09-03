@@ -14,8 +14,10 @@ export const useCreateItemMutation = () => {
     mutationFn: async (data: {
       name: string;
       location: "dry" | "wet" | "refrigerator" | "freezer";
-      description: string;
-      note: string;
+      description?: string;
+      note?: string;
+      bucket?: string;
+      path?: string;
     }) => {
       const res = await supabase.from("item").insert(data);
       return res.data;
