@@ -6,7 +6,7 @@ import { useBackButton, useMainButton } from "@telegram-apps/sdk-react";
 import { Input, Modal, Select, Textarea } from "@telegram-apps/telegram-ui";
 import { FloatingBubble, ImageUploader, List } from "antd-mobile";
 import { AddCircleOutline } from "antd-mobile-icons";
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { z } from "zod";
 import { FormFields } from "./interface";
 import { useCreateItemMutation, useItemsQuery } from "./service";
@@ -67,7 +67,12 @@ export const ItemsPage: FC = () => {
     },
   });
 
-  useEffect(() => {}, []);
+  const onOpen = useCallback(() => {
+    setOpenModal(true);
+    mainButton.setText("Create");
+    mainButton.enable();
+    mainButton.show();
+  }, []);
 
   return (
     <>
@@ -172,12 +177,12 @@ export const ItemsPage: FC = () => {
 
       <FloatingBubble
         style={{
-          "--initial-position-bottom": "100px",
-          "--initial-position-right": "24px",
+          "--initial-position-bottom": "10px",
+          "--initial-position-right": "10px",
           "--edge-distance": "24px",
         }}
         onClick={() => {
-          setOpenModal(true);
+          onOpen();
         }}
       >
         <AddCircleOutline fontSize={32} />
