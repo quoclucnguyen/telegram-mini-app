@@ -15,7 +15,9 @@ export const useItemsQuery = () => {
       const { data, error } = await itemsQuery;
 
       if (error) throw error;
+
       const items: Item = data;
+
       return items;
     },
   });

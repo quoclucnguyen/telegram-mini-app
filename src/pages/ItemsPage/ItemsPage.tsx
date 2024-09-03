@@ -72,8 +72,8 @@ export const ItemsPage: FC = () => {
     <>
       <List header="Items" className="w-full">
         {(itemsQuery.data?.length ?? 0) > 0 ? (
-          itemsQuery.data?.map((item, index) => (
-            <ListItem key={index} name={item.name} />
+          itemsQuery.data?.map(({ id, name, bucket, path }) => (
+            <ListItem key={id} name={name} bucket={bucket} path={path} />
           ))
         ) : (
           <List.Item>No items found</List.Item>
