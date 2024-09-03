@@ -4,7 +4,8 @@ import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useBackButton, useMainButton } from "@telegram-apps/sdk-react";
 import { Input, Modal, Select, Textarea } from "@telegram-apps/telegram-ui";
-import { ImageUploader, List } from "antd-mobile";
+import { FloatingBubble, ImageUploader, List } from "antd-mobile";
+import { AddCircleOutline } from "antd-mobile-icons";
 import { FC, useEffect, useState } from "react";
 import { z } from "zod";
 import { FormFields } from "./interface";
@@ -168,6 +169,19 @@ export const ItemsPage: FC = () => {
           </form>
         </Modal>
       )}
+
+      <FloatingBubble
+        style={{
+          "--initial-position-bottom": "100px",
+          "--initial-position-right": "24px",
+          "--edge-distance": "24px",
+        }}
+        onClick={() => {
+          setOpenModal(true);
+        }}
+      >
+        <AddCircleOutline fontSize={32} />
+      </FloatingBubble>
     </>
   );
 };
