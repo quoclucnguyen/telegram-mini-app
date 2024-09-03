@@ -6,21 +6,15 @@ import { Input, Modal, Select, Textarea } from "@telegram-apps/telegram-ui";
 import { ImageUploader } from "antd-mobile";
 import { FC, useEffect, useState } from "react";
 import { z } from "zod";
+import { FormFields } from "./interface";
 import { useCreateItemMutation } from "./service";
-
-interface FormFields {
-  name: string;
-  location: "dry" | "wet" | "refrigerator" | "freezer";
-  description: string;
-  note: string;
-}
 
 export const ItemsPage: FC = () => {
   const mainButton = useMainButton();
   const createItemMutation = useCreateItemMutation();
   const backButton = useBackButton();
 
-  const [openModal, setOpenModal] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
   const [imageUploadFile, setImageUploadFile] = useState<File | undefined>();
 
   backButton.on("click", () => {
@@ -69,11 +63,7 @@ export const ItemsPage: FC = () => {
     },
   });
 
-  useEffect(() => {
-    mainButton.setText("Create item");
-    mainButton.show();
-    mainButton.enable();
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <Modal open={openModal}>
