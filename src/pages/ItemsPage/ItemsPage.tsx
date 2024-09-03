@@ -1,13 +1,14 @@
 import { uploadFile } from "@/common/helper";
+import { ListItem } from "@/components/ListItem/ListItem";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useBackButton, useMainButton } from "@telegram-apps/sdk-react";
 import { Input, Modal, Select, Textarea } from "@telegram-apps/telegram-ui";
-import { ImageUploader } from "antd-mobile";
+import { ImageUploader, List } from "antd-mobile";
 import { FC, useEffect, useState } from "react";
 import { z } from "zod";
 import { FormFields } from "./interface";
-import { useCreateItemMutation } from "./service";
+import { useCreateItemMutation, useItemsQuery } from "./service";
 
 export const ItemsPage: FC = () => {
   const mainButton = useMainButton();
@@ -16,6 +17,8 @@ export const ItemsPage: FC = () => {
 
   const [openModal, setOpenModal] = useState(false);
   const [imageUploadFile, setImageUploadFile] = useState<File | undefined>();
+
+  const itemsQuery = useItemsQuery();
 
   backButton.on("click", () => {
     mainButton.hide();
@@ -66,89 +69,105 @@ export const ItemsPage: FC = () => {
   useEffect(() => {}, []);
 
   return (
-    <Modal open={openModal}>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          form.handleSubmit();
-        }}
-      >
-        <form.Field
-          name="name"
-          validatorAdapter={zodValidator()}
-          validators={{
-            onChange: z.string().min(1),
-          }}
-        >
-          {(field) => {
-            return (
-              <Input
-                name={field.name}
-                header="Name"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                status={field.state.meta.errors.length ? "error" : "default"}
-                itemRef="name"
-              />
-            );
-          }}
-        </form.Field>
+    <>
+      <List header="Items" className="w-full">
+        {(itemsQuery.data?.length ?? 0) > 0 ? (
+          itemsQuery.data?.map((item, index) => (
+            <ListItem key={index} name={item.name} />
+          ))
+        ) : (
+          <List.Item>No items found</List.Item>
+        )}
+      </List>
 
-        <form.Field name="location">
-          {(field) => (
-            <Select
-              name={field.name}
-              header="Location"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) =>
-                field.handleChange(e.target.value as FormFields["location"])
-              }
-            >
-              <option value={"dry"}>Dry</option>
-              <option value={"wet"}>Wet</option>
-              <option value={"refrigerator"}>Refrigerator</option>
-              <option value={"freezer"}>Freezer</option>
-            </Select>
-          )}
-        </form.Field>
-
-        <form.Field name="description">
-          {(field) => (
-            <Textarea
-              header="Description"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
-            />
-          )}
-        </form.Field>
-
-        <form.Field name="note">
-          {(field) => (
-            <Textarea
-              header="Note"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
-            />
-          )}
-        </form.Field>
-
-        <div className="px-[22px] pt-[20px] pb-[16px]">
-          <ImageUploader
-            maxCount={1}
-            upload={async (file: File) => {
-              setImageUploadFile(file);
-              return {
-                url: URL.createObjectURL(file),
-              };
+      {openModal && (
+        <Modal open={openModal}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              form.handleSubmit();
             }}
-          />
-        </div>
-      </form>
-    </Modal>
+          >
+            <form.Field
+              name="name"
+              validatorAdapter={zodValidator()}
+              validators={{
+                onChange: z.string().min(1),
+              }}
+            >
+              {(field) => {
+                return (
+                  <Input
+                    name={field.name}
+                    header="Name"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    status={
+                      field.state.meta.errors.length ? "error" : "default"
+                    }
+                    itemRef="name"
+                  />
+                );
+              }}
+            </form.Field>
+
+            <form.Field name="location">
+              {(field) => (
+                <Select
+                  name={field.name}
+                  header="Location"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) =>
+                    field.handleChange(e.target.value as FormFields["location"])
+                  }
+                >
+                  <option value={"dry"}>Dry</option>
+                  <option value={"wet"}>Wet</option>
+                  <option value={"refrigerator"}>Refrigerator</option>
+                  <option value={"freezer"}>Freezer</option>
+                </Select>
+              )}
+            </form.Field>
+
+            <form.Field name="description">
+              {(field) => (
+                <Textarea
+                  header="Description"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              )}
+            </form.Field>
+
+            <form.Field name="note">
+              {(field) => (
+                <Textarea
+                  header="Note"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              )}
+            </form.Field>
+
+            <div className="px-[22px] pt-[20px] pb-[16px]">
+              <ImageUploader
+                maxCount={1}
+                upload={async (file: File) => {
+                  setImageUploadFile(file);
+                  return {
+                    url: URL.createObjectURL(file),
+                  };
+                }}
+              />
+            </div>
+          </form>
+        </Modal>
+      )}
+    </>
   );
 };

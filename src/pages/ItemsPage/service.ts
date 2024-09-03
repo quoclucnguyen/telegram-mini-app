@@ -1,10 +1,22 @@
 import { supabase } from "@/supabase";
+import { QueryData } from "@supabase/supabase-js";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useItemsQuery = () => {
   return useQuery({
     queryKey: ["items"],
-    queryFn: () => supabase.from("item").select(),
+    queryFn: async () => {
+      // const { data } = await supabase.from("item").select();
+      const itemsQuery = supabase.from("item").select(`id, name, location`);
+
+      type Item = QueryData<typeof itemsQuery>;
+
+      const { data, error } = await itemsQuery;
+
+      if (error) throw error;
+      const items: Item = data;
+      return items;
+    },
   });
 };
 
