@@ -1,16 +1,34 @@
+import { createSignedUrl } from "@/common/storage";
 import { Image, ImageViewer, List, SwipeAction } from "antd-mobile";
-import { useCallback, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 
 interface ListItemProps {
   description?: string;
   name: string;
+  bucket?: string;
+  path?: string;
 }
 
-export const ListItem = ({ description, name }: ListItemProps) => {
-  const [imageUrl] = useState("");
+export const ListItem = ({
+  description,
+  name,
+  bucket,
+  path,
+}: ListItemProps) => {
+  const [imageUrl, setImageUrl] = useState("");
   const [visible, setVisible] = useState(false);
 
   const actionDeleteClick = useCallback(() => {}, []);
+
+  const getSignedUrl = useCallback(async () => {
+    if (!bucket || !path) return;
+    const url = await createSignedUrl(bucket, path);
+    setImageUrl(url);
+  }, []);
+
+  useLayoutEffect(() => {
+    getSignedUrl();
+  }, []);
 
   return (
     <>

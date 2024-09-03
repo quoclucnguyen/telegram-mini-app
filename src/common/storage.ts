@@ -31,3 +31,11 @@ export const getBucket = async (name: string) => {
 
   return { data, error };
 };
+
+export const createSignedUrl = async (bucket: string, path: string) => {
+  const { data } = await supabase.storage
+    .from(bucket)
+    .createSignedUrl(path, 60 * 60);
+
+  return data?.signedUrl ?? "";
+};
