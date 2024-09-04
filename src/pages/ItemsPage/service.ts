@@ -39,3 +39,13 @@ export const useCreateItemMutation = () => {
     },
   });
 };
+
+export const useDeleteItemMutation = () => {
+  return useMutation({
+    mutationKey: ["deleteItem"],
+    mutationFn: async (id: number) => {
+      const res = await supabase.from("item").delete().eq("id", id);
+      return res.data;
+    },
+  });
+}

@@ -6,30 +6,35 @@ import { useBackButton, useMainButton } from "@telegram-apps/sdk-react";
 import { Input, Modal, Select, Textarea } from "@telegram-apps/telegram-ui";
 import { FloatingBubble, ImageUploader, List } from "antd-mobile";
 import { AddCircleOutline } from "antd-mobile-icons";
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useLayoutEffect, useState } from "react";
 import { z } from "zod";
 import { FormFields } from "./interface";
-import { useCreateItemMutation, useItemsQuery } from "./service";
+import {
+  useCreateItemMutation,
+  useItemsQuery,
+} from "./service";
 
 export const ItemsPage: FC = () => {
   const mainButton = useMainButton();
-  const createItemMutation = useCreateItemMutation();
   const backButton = useBackButton();
+
+  const createItemMutation = useCreateItemMutation();
 
   const [openModal, setOpenModal] = useState(false);
   const [imageUploadFile, setImageUploadFile] = useState<File | undefined>();
 
   const itemsQuery = useItemsQuery();
 
-  backButton.on("click", () => {
-    mainButton.hide();
-    mainButton.enable();
-  });
+  useLayoutEffect(() => {
+    mainButton.on("click", () => {
+      form.handleSubmit();
+    });
 
-  mainButton.on("click", () => {
-    console.log("click");
-    form.handleSubmit();
-  });
+    backButton.on("click", () => {
+      mainButton.hide();
+      mainButton.enable();
+    });
+  }, []);
 
   const form = useForm<FormFields>({
     defaultValues: {
@@ -41,6 +46,7 @@ export const ItemsPage: FC = () => {
     onSubmit: async ({ value }) => {
       mainButton.showLoader();
       mainButton.disable();
+      mainButton.setText("Creating...");
 
       const bucket = "items";
       let path = undefined;
@@ -64,6 +70,8 @@ export const ItemsPage: FC = () => {
       mainButton.hide();
       form.reset();
       setOpenModal(false);
+
+      itemsQuery.refetch();
     },
   });
 
@@ -79,7 +87,7 @@ export const ItemsPage: FC = () => {
       <List header="Items" className="w-full">
         {(itemsQuery.data?.length ?? 0) > 0 ? (
           itemsQuery.data?.map(({ id, name, bucket, path }) => (
-            <ListItem key={id} name={name} bucket={bucket} path={path} />
+            <ListItem key={id} name={name} bucket={bucket} path={path} id={id} deleteCb={()=> itemsQuery.refetch()} />
           ))
         ) : (
           <List.Item>No items found</List.Item>

@@ -1,12 +1,15 @@
 import { createSignedUrl } from "@/common/storage";
+import { useDeleteItemMutation } from "@/pages/ItemsPage/service";
 import { Image, ImageViewer, List, SwipeAction } from "antd-mobile";
 import { useCallback, useLayoutEffect, useState } from "react";
 
 interface ListItemProps {
   description?: string;
   name: string;
-  bucket?: string;
-  path?: string;
+  bucket?: string | null;
+  path?: string | null;
+  id: number;
+  deleteCb?: () => void;
 }
 
 export const ListItem = ({
@@ -14,11 +17,18 @@ export const ListItem = ({
   name,
   bucket,
   path,
+  id,
+  deleteCb,
 }: ListItemProps) => {
   const [imageUrl, setImageUrl] = useState("");
   const [visible, setVisible] = useState(false);
 
-  const actionDeleteClick = useCallback(() => {}, []);
+  const deleteItemMutation = useDeleteItemMutation();
+
+  const actionDeleteClick = useCallback(async () => {
+    await deleteItemMutation.mutateAsync(id);
+    deleteCb?.();
+  }, []);
 
   const getSignedUrl = useCallback(async () => {
     if (!bucket || !path) return;
