@@ -33,6 +33,7 @@ export const useCreateItemMutation = () => {
       note?: string;
       bucket?: string;
       path?: string;
+      expired_at?: string;
     }) => {
       const res = await supabase.from("item").insert(data);
       return res.data;
@@ -48,4 +49,4 @@ export const useDeleteItemMutation = () => {
       return res.data;
     },
   });
-}
+};

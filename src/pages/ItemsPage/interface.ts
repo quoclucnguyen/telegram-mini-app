@@ -3,4 +3,5 @@ export interface FormFields {
   location: "dry" | "wet" | "refrigerator" | "freezer";
   description: string;
   note: string;
+  expiredAt: string;
 }
