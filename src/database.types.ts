@@ -81,6 +81,7 @@ export type Database = {
           bucket: string | null
           created_at: string | null
           description: string | null
+          expired_at: string | null
           id: number
           location: Database["public"]["Enums"]["location_enum"]
           name: string
@@ -92,6 +93,7 @@ export type Database = {
           bucket?: string | null
           created_at?: string | null
           description?: string | null
+          expired_at?: string | null
           id?: number
           location: Database["public"]["Enums"]["location_enum"]
           name: string
@@ -103,6 +105,7 @@ export type Database = {
           bucket?: string | null
           created_at?: string | null
           description?: string | null
+          expired_at?: string | null
           id?: number
           location?: Database["public"]["Enums"]["location_enum"]
           name?: string
