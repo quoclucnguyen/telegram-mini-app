@@ -113,7 +113,16 @@ export const ItemsPage: FC = () => {
       <List header="Items" className="w-full">
         {(itemsQuery.data?.length ?? 0) > 0 ? (
           itemsQuery.data?.map(
-            ({ id, name, bucket, path, note, expired_at }) => {
+            ({
+              id,
+              name,
+              bucket,
+              path,
+              note,
+              expired_at,
+              status,
+              location,
+            }) => {
               const description =
                 dayjs(expired_at).format("DD/MM-YYYY") +
                 (note ? ` - ${note}` : "");
@@ -128,6 +137,8 @@ export const ItemsPage: FC = () => {
                   deleteCb={() => itemsQuery.refetch()}
                   description={description}
                   expiredAt={expired_at}
+                  status={status}
+                  location={location}
                 />
               );
             },

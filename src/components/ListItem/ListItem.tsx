@@ -19,6 +19,8 @@ interface ListItemProps {
   id: number;
   deleteCb?: () => void;
   expiredAt?: string | null;
+  status?: "out_date" | "ate" | null;
+  location?: "dry" | "wet" | "refrigerator" | "freezer";
 }
 
 export const ListItem = ({
@@ -29,6 +31,7 @@ export const ListItem = ({
   id,
   expiredAt,
   deleteCb,
+  location,
 }: ListItemProps) => {
   const [imageUrl, setImageUrl] = useState("");
   const [visible, setVisible] = useState(false);
@@ -95,6 +98,7 @@ export const ListItem = ({
             </Badge>
           }
           description={description}
+          title={location}
         >
           {name}
         </List.Item>

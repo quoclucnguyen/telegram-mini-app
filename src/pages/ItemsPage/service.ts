@@ -9,7 +9,7 @@ export const useItemsQuery = () => {
       const itemsQuery = supabase
         .from("item")
         .select(
-          `id, name, location, bucket, path, expired_at, description, note`,
+          `id, name, location, bucket, path, expired_at, description, note, status`,
         );
 
       type Item = QueryData<typeof itemsQuery>;
