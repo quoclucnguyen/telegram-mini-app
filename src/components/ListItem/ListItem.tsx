@@ -71,7 +71,7 @@ export const ListItem = ({
       const days = Math.floor(remainingTime / 86400);
       return `${days}d`;
     }
-    if (remainingTime) return formatTime(remainingTime);
+    if (remainingTime > 0) return formatTime(remainingTime);
   }, [remainingTime]);
 
   return (

@@ -2,7 +2,6 @@ import { uploadFile } from "@/common/helper";
 import { ListItem } from "@/components/ListItem/ListItem";
 import { useBackButton, useMainButton } from "@telegram-apps/sdk-react";
 import {
-  Button,
   CalendarPicker,
   FloatingBubble,
   Form,
@@ -207,11 +206,11 @@ export const ItemsPage: FC = () => {
               />
             </Form.Item>
 
-            <Form.Item>
+            {/* <Form.Item>
               <Button block color="primary" onClick={() => form.submit()}>
                 Block Button
               </Button>
-            </Form.Item>
+            </Form.Item> */}
           </Form>
         </div>
       </Popup>

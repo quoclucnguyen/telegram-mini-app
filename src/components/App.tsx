@@ -1,4 +1,4 @@
-import { routes } from "@/navigation/routes.tsx";
+import { ItemsPage } from "@/pages/ItemsPage/ItemsPage";
 import { useIntegration } from "@telegram-apps/react-router-integration";
 import {
   bindMiniAppCSSVars,
@@ -14,7 +14,7 @@ import { AppRoot } from "@telegram-apps/telegram-ui";
 import { ConfigProvider } from "antd-mobile";
 import enUS from "antd-mobile/es/locales/en-US";
 import { type FC, useEffect, useLayoutEffect, useMemo } from "react";
-import { Navigate, Route, Router, Routes } from "react-router-dom";
+import { Route, Router, Routes } from "react-router-dom";
 
 export const App: FC = () => {
   const lp = useLaunchParams();
@@ -49,7 +49,7 @@ export const App: FC = () => {
   useLayoutEffect(() => {
     document.documentElement.setAttribute(
       "data-prefers-color-scheme",
-      miniApp.isDark ? "dark" : "light"
+      miniApp.isDark ? "dark" : "light",
     );
   }, [miniApp.isDark]);
 
@@ -61,10 +61,7 @@ export const App: FC = () => {
       <ConfigProvider locale={enUS}>
         <Router location={location} navigator={reactNavigator}>
           <Routes>
-            {routes.map((route) => (
-              <Route key={route.path} {...route} />
-            ))}
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="*" element={<ItemsPage />} />
           </Routes>
         </Router>
       </ConfigProvider>
