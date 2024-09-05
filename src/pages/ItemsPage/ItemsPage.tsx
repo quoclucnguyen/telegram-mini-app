@@ -2,6 +2,7 @@ import { uploadFile } from "@/common/helper";
 import { ListItem } from "@/components/ListItem/ListItem";
 import { useBackButton, useMainButton } from "@telegram-apps/sdk-react";
 import {
+  Button,
   CalendarPicker,
   FloatingBubble,
   Form,
@@ -29,7 +30,7 @@ export const ItemsPage: FC = () => {
   const [imageUploadFile, setImageUploadFile] = useState<File | undefined>();
   const [calendarPickerVisible, setCalendarPickerVisible] =
     useState<boolean>(false);
-  const [expiredAt, setExpiredAt] = useState("");
+  const [expiredAt, setExpiredAt] = useState<Date | undefined>(undefined);
   const [form] = Form.useForm();
 
   const itemsQuery = useItemsQuery();
@@ -43,68 +44,94 @@ export const ItemsPage: FC = () => {
       mainButton.hide();
       mainButton.enable();
     });
-  }, []);
+  }, [backButton, form, mainButton]);
 
-  const formSubmit = useCallback(async (values: FormFields) => {
-    console.log("values: ", values);
-    console.log("expiredAt: ", expiredAt);
-    mainButton.showLoader();
-    mainButton.disable();
-    mainButton.setText("Creating...");
+  const formSubmit = useCallback(
+    async (values: FormFields) => {
+      delete values.file;
 
-    const bucket = "items";
-    let path = undefined;
+      mainButton.showLoader();
+      mainButton.disable();
+      mainButton.setText("Creating...");
 
-    if (imageUploadFile) {
-      const { path: resultPath } = await uploadFile(
-        imageUploadFile,
-        "items",
-        "images"
-      );
+      const bucket = "items";
+      let path = undefined;
 
-      if (resultPath) {
-        path = resultPath;
+      if (imageUploadFile) {
+        const { path: resultPath } = await uploadFile(
+          imageUploadFile,
+          "items",
+          "images",
+        );
+
+        if (resultPath) {
+          path = resultPath;
+        }
       }
-    }
 
-    await createItemMutation.mutateAsync({
-      ...values,
-      bucket,
-      path,
-      expired_at: expiredAt ? dayjs(expiredAt).toISOString() : undefined,
-    });
+      await createItemMutation.mutateAsync({
+        ...values,
+        bucket,
+        path,
+        expired_at: expiredAt
+          ? dayjs(expiredAt)
+              .set("hour", 23)
+              .set("minute", 59)
+              .set("second", 59)
+              .toISOString()
+          : undefined,
+      });
 
-    mainButton.hideLoader();
-    mainButton.enable();
-    mainButton.hide();
-    form.resetFields();
-    setImageUploadFile(undefined);
-    setOpenModal(false);
+      mainButton.hideLoader();
+      mainButton.enable();
+      mainButton.hide();
+      form.resetFields();
+      setImageUploadFile(undefined);
+      setOpenModal(false);
 
-    itemsQuery.refetch();
-  }, []);
+      itemsQuery.refetch();
+    },
+    [
+      createItemMutation,
+      expiredAt,
+      form,
+      imageUploadFile,
+      itemsQuery,
+      mainButton,
+    ],
+  );
 
   const onOpen = useCallback(() => {
     setOpenModal(true);
     mainButton.setText("Create");
     mainButton.enable();
     mainButton.show();
-  }, []);
+  }, [mainButton]);
 
   return (
     <>
       <List header="Items" className="w-full">
         {(itemsQuery.data?.length ?? 0) > 0 ? (
-          itemsQuery.data?.map(({ id, name, bucket, path }) => (
-            <ListItem
-              key={id}
-              name={name}
-              bucket={bucket}
-              path={path}
-              id={id}
-              deleteCb={() => itemsQuery.refetch()}
-            />
-          ))
+          itemsQuery.data?.map(
+            ({ id, name, bucket, path, note, expired_at }) => {
+              const description =
+                dayjs(expired_at).format("DD/MM-YYYY") +
+                (note ? ` - ${note}` : "");
+
+              return (
+                <ListItem
+                  key={id}
+                  name={name}
+                  bucket={bucket}
+                  path={path}
+                  id={id}
+                  deleteCb={() => itemsQuery.refetch()}
+                  description={description}
+                  expiredAt={expired_at}
+                />
+              );
+            },
+          )
         ) : (
           <List.Item>No items found</List.Item>
         )}
@@ -140,6 +167,7 @@ export const ItemsPage: FC = () => {
               <ImageUploader
                 maxCount={1}
                 upload={async (file: File) => {
+                  console.log(file);
                   setImageUploadFile(file);
                   return {
                     url: URL.createObjectURL(file),
@@ -148,10 +176,13 @@ export const ItemsPage: FC = () => {
               />
             </Form.Item>
 
-            <Form.Item label="Expired at">
+            <Form.Item
+              label="Expired at"
+              onClick={() => setCalendarPickerVisible(true)}
+            >
               <Input
-                onClick={() => setCalendarPickerVisible(true)}
-                value={expiredAt}
+                disabled
+                value={expiredAt ? dayjs(expiredAt).format("DD/MM/YYYY") : ""}
               />
 
               <CalendarPicker
@@ -160,9 +191,15 @@ export const ItemsPage: FC = () => {
                 onClose={() => setCalendarPickerVisible(false)}
                 onMaskClick={() => setCalendarPickerVisible(false)}
                 onChange={(val) => {
-                  setExpiredAt(dayjs(val ?? null).format("DD/MM/YYYY") ?? "");
+                  setExpiredAt(dayjs(val ?? null).toDate());
                 }}
               />
+            </Form.Item>
+
+            <Form.Item>
+              <Button block color="primary" onClick={() => form.submit()}>
+                Block Button
+              </Button>
             </Form.Item>
           </Form>
         </div>

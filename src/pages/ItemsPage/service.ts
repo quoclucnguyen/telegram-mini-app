@@ -8,7 +8,9 @@ export const useItemsQuery = () => {
     queryFn: async () => {
       const itemsQuery = supabase
         .from("item")
-        .select(`id, name, location, bucket, path`);
+        .select(
+          `id, name, location, bucket, path, expired_at, description, note`,
+        );
 
       type Item = QueryData<typeof itemsQuery>;
 

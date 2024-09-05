@@ -4,4 +4,5 @@ export interface FormFields {
   description: string;
   note: string;
   expiredAt: string;
+  file?: File;
 }
