@@ -1,6 +1,6 @@
-import {uploadFile} from "@/common/helper";
-import {ListItem} from "@/components/ListItem/ListItem";
-import {useBackButton, useMainButton} from "@telegram-apps/sdk-react";
+import { uploadFile } from "@/common/helper";
+import { ListItem } from "@/components/ListItem/ListItem";
+import { useBackButton, useMainButton } from "@telegram-apps/sdk-react";
 import {
   Button,
   CalendarPicker,
@@ -14,12 +14,12 @@ import {
   Space,
   TextArea,
 } from "antd-mobile";
-import {AddCircleOutline} from "antd-mobile-icons";
+import { AddCircleOutline } from "antd-mobile-icons";
 import dayjs from "dayjs";
 import pica from "pica";
-import {FC, useCallback, useLayoutEffect, useState} from "react";
-import {FormFields} from "./interface";
-import {useCreateItemMutation, useItemsQuery} from "./service";
+import { FC, useCallback, useLayoutEffect, useState } from "react";
+import { FormFields } from "./interface";
+import { useCreateItemMutation, useItemsQuery } from "./service";
 
 export const ItemsPage: FC = () => {
   const mainButton = useMainButton();
@@ -256,7 +256,7 @@ export const ItemsPage: FC = () => {
               />
             </Form.Item>
 
-            {import.meta.env.VITE_IS_LOCAL_DEV && (
+            {import.meta.env.VITE_IS_LOCAL_DEV === "true" && (
               <Form.Item>
                 <Button block color="primary" onClick={() => form.submit()}>
                   Submit

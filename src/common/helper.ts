@@ -26,11 +26,6 @@ export const formatTime = (seconds: number) => {
   const minutes = Math.floor((seconds % 3600) / 60);
   const secs = seconds % 60;
 
-  console.log(seconds);
-  console.log(hours);
-  console.log(minutes);
-  console.log(secs);
-
   return [
     hours.toString().padStart(2, "0"),
     minutes.toString().padStart(2, "0"),
