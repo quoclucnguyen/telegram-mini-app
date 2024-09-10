@@ -1,7 +1,8 @@
-import { uploadFile } from "@/common/helper";
-import { ListItem } from "@/components/ListItem/ListItem";
-import { useBackButton, useMainButton } from "@telegram-apps/sdk-react";
+import {uploadFile} from "@/common/helper";
+import {ListItem} from "@/components/ListItem/ListItem";
+import {useBackButton, useMainButton} from "@telegram-apps/sdk-react";
 import {
+  Button,
   CalendarPicker,
   FloatingBubble,
   Form,
@@ -13,11 +14,12 @@ import {
   Space,
   TextArea,
 } from "antd-mobile";
-import { AddCircleOutline } from "antd-mobile-icons";
+import {AddCircleOutline} from "antd-mobile-icons";
 import dayjs from "dayjs";
-import { FC, useCallback, useLayoutEffect, useState } from "react";
-import { FormFields } from "./interface";
-import { useCreateItemMutation, useItemsQuery } from "./service";
+import pica from "pica";
+import {FC, useCallback, useLayoutEffect, useState} from "react";
+import {FormFields} from "./interface";
+import {useCreateItemMutation, useItemsQuery} from "./service";
 
 export const ItemsPage: FC = () => {
   const mainButton = useMainButton();
@@ -45,6 +47,53 @@ export const ItemsPage: FC = () => {
     });
   }, [backButton, form, mainButton]);
 
+  // Pica instance
+  const picaInstance = pica();
+
+  const resizeImage = useCallback(
+    async (file: File) => {
+      const img = document.createElement("img");
+      const canvas = document.createElement("canvas");
+
+      const reader = new FileReader();
+
+      // Convert file to image element
+      return new Promise<File>((resolve, reject) => {
+        reader.onload = async (e) => {
+          img.src = e.target?.result as string;
+
+          img.onload = async () => {
+            const width = 800; // Desired width, you can adjust this
+            const height = (img.height * width) / img.width;
+
+            canvas.width = width;
+            canvas.height = height;
+
+            try {
+              // Resize using Pica
+              await picaInstance.resize(img, canvas);
+              const resizedBlob = await picaInstance.toBlob(canvas, file.type);
+
+              // Convert the blob back to a File object for upload
+              const resizedFile = new File([resizedBlob], file.name, {
+                type: file.type,
+                lastModified: Date.now(),
+              });
+
+              resolve(resizedFile);
+            } catch (err) {
+              reject(err as Error);
+            }
+          };
+        };
+
+        reader.onerror = () => reject(new Error("Failed to load image"));
+        reader.readAsDataURL(file);
+      });
+    },
+    [picaInstance],
+  );
+
   const formSubmit = useCallback(
     async (values: FormFields) => {
       delete values.file;
@@ -58,7 +107,7 @@ export const ItemsPage: FC = () => {
 
       if (imageUploadFile) {
         const { path: resultPath } = await uploadFile(
-          imageUploadFile,
+          await resizeImage(imageUploadFile),
           "items",
           "images",
         );
@@ -97,6 +146,7 @@ export const ItemsPage: FC = () => {
       imageUploadFile,
       itemsQuery,
       mainButton,
+      resizeImage,
     ],
   );
 
@@ -206,11 +256,13 @@ export const ItemsPage: FC = () => {
               />
             </Form.Item>
 
-            {/* <Form.Item>
-              <Button block color="primary" onClick={() => form.submit()}>
-                Block Button
-              </Button>
-            </Form.Item> */}
+            {import.meta.env.VITE_IS_LOCAL_DEV && (
+              <Form.Item>
+                <Button block color="primary" onClick={() => form.submit()}>
+                  Submit
+                </Button>
+              </Form.Item>
+            )}
           </Form>
         </div>
       </Popup>
