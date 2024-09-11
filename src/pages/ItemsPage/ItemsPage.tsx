@@ -1,33 +1,35 @@
-import { ListItem } from "@/components/ListItem/ListItem";
-import { useBackButton, useMainButton } from "@telegram-apps/sdk-react";
-import { FloatingBubble, Form, List } from "antd-mobile";
+import { ItemInterface, ListItem } from "@/components/ListItem/ListItem";
+import { useMainButton } from "@telegram-apps/sdk-react";
+import {
+  FloatingBubble,
+  InfiniteScroll,
+  List,
+  PullToRefresh,
+} from "antd-mobile";
 import { AddCircleOutline } from "antd-mobile-icons";
 import dayjs from "dayjs";
-import { FC, useCallback, useLayoutEffect, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import ItemPopup from "./ItemPopup";
-import { useItemsQuery } from "./service";
+import { useGetItemsMutation } from "./service";
 
 export const ItemsPage: FC = () => {
   const mainButton = useMainButton();
-  const backButton = useBackButton();
+
   const [openModal, setOpenModal] = useState(false);
+  const [data, setData] = useState<ItemInterface[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [offset, setOffset] = useState(0);
 
-  const [form] = Form.useForm();
+  const getItemsMutation = useGetItemsMutation();
 
-  const itemsQuery = useItemsQuery();
-
-  useLayoutEffect(() => {
-    mainButton.on("click", () => {
-      form.submit();
-    });
-
-    backButton.on("click", () => {
-      mainButton.hide();
-      mainButton.enable();
-    });
-  }, [backButton, form, mainButton]);
-
-  // Pica instance
+  const loadMore = useCallback(async () => {
+    const append = await getItemsMutation.mutateAsync({ take: 5, offset });
+    if (append) {
+      setData((val) => [...val, ...append]);
+    }
+    setHasMore((append?.length ?? 0) > 0);
+    setOffset((val) => val + 5);
+  }, [getItemsMutation, offset]);
 
   const onOpen = useCallback(() => {
     setOpenModal(true);
@@ -38,46 +40,61 @@ export const ItemsPage: FC = () => {
 
   return (
     <>
-      <List header="Items" className="w-full">
-        {(itemsQuery.data?.length ?? 0) > 0 ? (
-          itemsQuery.data?.map(
-            ({
-              id,
-              name,
-              bucket,
-              path,
-              note,
-              expired_at,
-              status,
-              location,
-            }) => {
-              const description =
-                dayjs(expired_at).format("DD/MM-YYYY") +
-                (note ? ` - ${note}` : "");
+      <PullToRefresh
+        onRefresh={async () => {
+          Promise.all([setOffset(0)]);
+          setData([]);
+        }}
+      >
+        <List header="Items" className="w-full">
+          {data.length > 0 ? (
+            data.map(
+              ({
+                id,
+                name,
+                bucket,
+                path,
+                note,
+                expired_at,
+                status,
+                location,
+              }) => {
+                const description =
+                  dayjs(expired_at).format("DD/MM-YYYY") +
+                  (note ? ` - ${note}` : "");
 
-              return (
-                <ListItem
-                  key={id}
-                  name={name}
-                  bucket={bucket}
-                  path={path}
-                  id={id}
-                  deleteCb={() => itemsQuery.refetch()}
-                  description={description}
-                  expiredAt={expired_at}
-                  status={status}
-                  location={location}
-                />
-              );
-            },
-          )
-        ) : (
-          <List.Item>No items found</List.Item>
-        )}
-      </List>
+                return (
+                  <ListItem
+                    key={id}
+                    name={name}
+                    bucket={bucket}
+                    path={path}
+                    id={id}
+                    deleteCb={() => {
+                      setData((val) => val.filter((v) => v.id !== id));
+                    }}
+                    description={description}
+                    expired_at={expired_at}
+                    status={status}
+                    location={location}
+                    note={null}
+                  />
+                );
+              },
+            )
+          ) : (
+            <List.Item>No items found</List.Item>
+          )}
+        </List>
+
+        <InfiniteScroll loadMore={loadMore} hasMore={hasMore} />
+      </PullToRefresh>
 
       <ItemPopup
-        cb={() => itemsQuery.refetch()}
+        cb={async () => {
+          Promise.all([setOffset(0)]);
+          setData([]);
+        }}
         openModal={openModal}
         setOpenModal={setOpenModal}
       />
