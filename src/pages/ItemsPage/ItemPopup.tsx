@@ -177,7 +177,6 @@ const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
             <ImageUploader
               maxCount={1}
               upload={async (file: File) => {
-                console.log(file);
                 setImageUploadFile(file);
                 return {
                   url: URL.createObjectURL(file),
