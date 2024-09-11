@@ -1,5 +1,5 @@
 import { uploadFile } from "@/common/helper";
-import { useMainButton } from "@telegram-apps/sdk-react";
+import { useBackButton, useMainButton } from "@telegram-apps/sdk-react";
 import {
   Button,
   CalendarPicker,
@@ -13,7 +13,7 @@ import {
 } from "antd-mobile";
 import dayjs from "dayjs";
 import pica from "pica";
-import { useCallback, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import { FormFields } from "./interface";
 import { useCreateItemMutation } from "./service";
 
@@ -31,6 +31,8 @@ const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
   const [expiredAt, setExpiredAt] = useState<Date | undefined>(undefined);
 
   const mainButton = useMainButton();
+  const backButton = useBackButton();
+
   const createItemMutation = useCreateItemMutation();
 
   const picaInstance = pica();
@@ -136,6 +138,17 @@ const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
       setOpenModal,
     ],
   );
+
+  useLayoutEffect(() => {
+    mainButton.on("click", () => {
+      form.submit();
+    });
+
+    backButton.on("click", () => {
+      mainButton.hide();
+      mainButton.enable();
+    });
+  }, [backButton, form, formSubmit, mainButton]);
 
   return (
     <Popup visible={openModal} onMaskClick={() => setOpenModal(false)}>
