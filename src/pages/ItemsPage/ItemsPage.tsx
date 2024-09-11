@@ -1,5 +1,4 @@
 import { ItemInterface, ListItem } from "@/components/ListItem/ListItem";
-import { useMainButton } from "@telegram-apps/sdk-react";
 import {
   FloatingBubble,
   InfiniteScroll,
@@ -13,8 +12,6 @@ import ItemPopup from "./ItemPopup";
 import { useGetItemsMutation } from "./service";
 
 export const ItemsPage: FC = () => {
-  const mainButton = useMainButton();
-
   const [openModal, setOpenModal] = useState(false);
   const [data, setData] = useState<ItemInterface[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -33,10 +30,7 @@ export const ItemsPage: FC = () => {
 
   const onOpen = useCallback(() => {
     setOpenModal(true);
-    mainButton.setText("Create");
-    mainButton.enable();
-    mainButton.show();
-  }, [mainButton]);
+  }, []);
 
   return (
     <>

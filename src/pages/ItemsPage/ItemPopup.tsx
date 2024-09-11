@@ -1,5 +1,4 @@
 import { uploadFile } from "@/common/helper";
-import { useBackButton, useMainButton } from "@telegram-apps/sdk-react";
 import {
   Button,
   CalendarPicker,
@@ -13,7 +12,7 @@ import {
 } from "antd-mobile";
 import dayjs from "dayjs";
 import pica from "pica";
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { FormFields } from "./interface";
 import { useCreateItemMutation } from "./service";
 
@@ -29,9 +28,6 @@ const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
   const [calendarPickerVisible, setCalendarPickerVisible] =
     useState<boolean>(false);
   const [expiredAt, setExpiredAt] = useState<Date | undefined>(undefined);
-
-  const mainButton = useMainButton();
-  const backButton = useBackButton();
 
   const createItemMutation = useCreateItemMutation();
 
@@ -85,10 +81,6 @@ const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
     async (values: FormFields) => {
       delete values.file;
 
-      mainButton.showLoader();
-      mainButton.disable();
-      mainButton.setText("Creating...");
-
       const bucket = "items";
       let path = undefined;
 
@@ -117,9 +109,6 @@ const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
           : undefined,
       });
 
-      mainButton.hideLoader();
-      mainButton.enable();
-      mainButton.hide();
       form.resetFields();
       setImageUploadFile(undefined);
       setOpenModal(false);
@@ -133,22 +122,10 @@ const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
       expiredAt,
       form,
       imageUploadFile,
-      mainButton,
       resizeImage,
       setOpenModal,
     ],
   );
-
-  useLayoutEffect(() => {
-    mainButton.on("click", () => {
-      form.submit();
-    });
-
-    backButton.on("click", () => {
-      mainButton.hide();
-      mainButton.enable();
-    });
-  }, [backButton, form, formSubmit, mainButton]);
 
   return (
     <Popup visible={openModal} onMaskClick={() => setOpenModal(false)}>
@@ -218,13 +195,16 @@ const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
             />
           </Form.Item>
 
-          {import.meta.env.VITE_IS_LOCAL_DEV === "true" && (
-            <Form.Item>
-              <Button block color="primary" onClick={() => form.submit()}>
-                Submit
-              </Button>
-            </Form.Item>
-          )}
+          <Form.Item>
+            <Button
+              block
+              color="primary"
+              onClick={() => form.submit()}
+              loading={createItemMutation.isPending}
+            >
+              Submit
+            </Button>
+          </Form.Item>
         </Form>
       </div>
     </Popup>
