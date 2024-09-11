@@ -11,16 +11,20 @@ import {
   useState,
 } from "react";
 
-interface ListItemProps {
-  description?: string;
+export interface ItemInterface {
+  description: string | null;
   name: string;
-  bucket?: string | null;
-  path?: string | null;
+  bucket: string | null;
+  path: string | null;
   id: number;
-  deleteCb?: () => void;
-  expiredAt?: string | null;
-  status?: "out_date" | "ate" | null;
+  status: "out_date" | "ate" | null;
   location?: "dry" | "wet" | "refrigerator" | "freezer";
+  note: string | null;
+  expired_at: string | null;
+}
+
+interface ItemProps extends ItemInterface {
+  deleteCb?: () => void;
 }
 
 export const ListItem = ({
@@ -29,10 +33,10 @@ export const ListItem = ({
   bucket,
   path,
   id,
-  expiredAt,
   deleteCb,
+  expired_at,
   location,
-}: ListItemProps) => {
+}: ItemProps) => {
   const [imageUrl, setImageUrl] = useState("");
   const [visible, setVisible] = useState(false);
 
@@ -53,8 +57,8 @@ export const ListItem = ({
 
   useLayoutEffect(() => {
     getSignedUrl();
-    setRemainingTime(dayjs(expiredAt).unix() - dayjs().unix());
-  }, [expiredAt, getSignedUrl]);
+    setRemainingTime(dayjs(expired_at).unix() - dayjs().unix());
+  }, [expired_at, getSignedUrl]);
 
   useEffect(() => {
     if (remainingTime <= 0) return;
@@ -74,6 +78,16 @@ export const ListItem = ({
     if (remainingTime > 0) return formatTime(remainingTime);
   }, [remainingTime]);
 
+  const badgeColor = useMemo(() => {
+    if (remainingTime >= 86400 * 3) {
+      return "green";
+    }
+    if (remainingTime >= 86400) {
+      return "orange";
+    }
+    return "red";
+  }, [remainingTime]);
+
   return (
     <>
       <SwipeAction
@@ -88,7 +102,7 @@ export const ListItem = ({
       >
         <List.Item
           prefix={
-            <Badge content={badgeConent}>
+            <Badge content={badgeConent} color={badgeColor}>
               <Image
                 width={40}
                 height={40}
