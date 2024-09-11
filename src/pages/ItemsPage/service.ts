@@ -2,16 +2,17 @@ import { supabase } from "@/supabase";
 import { QueryData } from "@supabase/supabase-js";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-export const useItemsQuery = () => {
+export const useItemsQuery = (take = 5, offset = 0) => {
   return useQuery({
-    queryKey: ["items"],
+    queryKey: ["items", take, offset],
     queryFn: async () => {
       const itemsQuery = supabase
         .from("item")
         .select(
           `id, name, location, bucket, path, expired_at, description, note, status`,
-        );
-
+        )
+        .order("expired_at", { ascending: true })
+        .range(offset, offset + take - 1);
       type Item = QueryData<typeof itemsQuery>;
 
       const { data, error } = await itemsQuery;
@@ -49,6 +50,31 @@ export const useDeleteItemMutation = () => {
     mutationFn: async (id: number) => {
       const res = await supabase.from("item").delete().eq("id", id);
       return res.data;
+    },
+  });
+};
+
+export const useGetItemsMutation = () => {
+  return useMutation({
+    mutationKey: ["items"],
+
+    mutationFn: async ({ take, offset }: { take: number; offset: number }) => {
+      const itemsQuery = supabase
+        .from("item")
+        .select(
+          `id, name, location, bucket, path, expired_at, description, note, status`,
+        )
+        .order("expired_at", { ascending: true })
+        .range(offset, offset + take - 1);
+      type Item = QueryData<typeof itemsQuery>;
+
+      const { data, error } = await itemsQuery;
+
+      if (error) throw error;
+
+      const items: Item = data;
+
+      return items;
     },
   });
 };
