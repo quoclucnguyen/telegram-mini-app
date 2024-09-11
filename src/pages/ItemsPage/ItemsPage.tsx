@@ -95,6 +95,7 @@ export const ItemsPage: FC = () => {
         cb={async () => {
           Promise.all([setOffset(0)]);
           setData([]);
+          setHasMore(true);
         }}
         openModal={openModal}
         setOpenModal={setOpenModal}
