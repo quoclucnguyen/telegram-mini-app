@@ -44,6 +44,7 @@ export const ItemsPage: FC = () => {
         onRefresh={async () => {
           Promise.all([setOffset(0)]);
           setData([]);
+          setHasMore(true);
         }}
       >
         <List header="Items" className="w-full">
