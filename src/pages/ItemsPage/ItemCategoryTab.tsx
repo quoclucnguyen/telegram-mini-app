@@ -1,4 +1,4 @@
-import { ItemInterface, ListItem } from "@/components/ListItem/ListItem";
+import { ListItem } from "@/components/ListItem/ListItem";
 import {
   FloatingBubble,
   InfiniteScroll,
@@ -7,9 +7,8 @@ import {
   SearchBar,
 } from "antd-mobile";
 import { AddCircleOutline } from "antd-mobile-icons";
-import dayjs from "dayjs";
 import { useCallback, useEffect, useState } from "react";
-import { CategoryEnum } from "./interface";
+import { CategoryEnum, ItemInterface } from "./interface";
 import ItemPopup from "./ItemPopup";
 import { useGetItemsMutation } from "./service";
 
@@ -93,40 +92,17 @@ const ItemsPageCategoryTab = ({
         />
         <List className="w-full">
           {data.length > 0 ? (
-            data.map(
-              ({
-                id,
-                name,
-                bucket,
-                path,
-                note,
-                expired_at,
-                status,
-                location,
-              }) => {
-                const description =
-                  dayjs(expired_at).format("DD/MM-YYYY") +
-                  (note ? ` - ${note}` : "");
-
-                return (
-                  <ListItem
-                    key={id}
-                    name={name}
-                    bucket={bucket}
-                    path={path}
-                    id={id}
-                    deleteCb={() => {
-                      setData((val) => val.filter((v) => v.id !== id));
-                    }}
-                    description={description}
-                    expired_at={expired_at}
-                    status={status}
-                    location={location}
-                    note={null}
-                  />
-                );
-              },
-            )
+            data.map((item) => {
+              return (
+                <ListItem
+                  key={item.id}
+                  deleteCb={() => {
+                    setData((val) => val.filter((v) => v.id !== item.id));
+                  }}
+                  item={item}
+                />
+              );
+            })
           ) : (
             <List.Item>No items found</List.Item>
           )}

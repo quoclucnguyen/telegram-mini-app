@@ -1,7 +1,17 @@
 import { formatTime } from "@/common/helper";
 import { createSignedUrl } from "@/common/storage";
+import { ItemInterface } from "@/pages/ItemsPage/interface";
 import { useDeleteItemMutation } from "@/pages/ItemsPage/service";
-import { Badge, Image, ImageViewer, List, SwipeAction } from "antd-mobile";
+import {
+  Badge,
+  Image,
+  ImageViewer,
+  List,
+  Modal,
+  Space,
+  SwipeAction,
+} from "antd-mobile";
+import { DeleteOutline } from "antd-mobile-icons";
 import dayjs from "dayjs";
 import {
   useCallback,
@@ -11,32 +21,14 @@ import {
   useState,
 } from "react";
 
-export interface ItemInterface {
-  description: string | null;
-  name: string;
-  bucket: string | null;
-  path: string | null;
-  id: number;
-  status: "out_date" | "ate" | null;
-  location?: "dry" | "wet" | "refrigerator" | "freezer";
-  note: string | null;
-  expired_at: string | null;
-}
-
-interface ItemProps extends ItemInterface {
+interface ItemProps {
   deleteCb?: () => void;
+  item: ItemInterface;
 }
 
-export const ListItem = ({
-  description,
-  name,
-  bucket,
-  path,
-  id,
-  deleteCb,
-  expired_at,
-  location,
-}: ItemProps) => {
+export const ListItem = ({ item, deleteCb }: ItemProps) => {
+  const { description, name, bucket, path, id, expired_at, location, note } =
+    item;
   const [imageUrl, setImageUrl] = useState("");
   const [visible, setVisible] = useState(false);
 
@@ -45,8 +37,15 @@ export const ListItem = ({
   const deleteItemMutation = useDeleteItemMutation();
 
   const actionDeleteClick = useCallback(async () => {
-    await deleteItemMutation.mutateAsync(id);
-    deleteCb?.();
+    Modal.confirm({
+      content: "Are you sure you want to delete this item?",
+      onConfirm: async () => {
+        await deleteItemMutation.mutateAsync(id);
+        deleteCb?.();
+      },
+      confirmText: "Delete",
+      cancelText: "Cancel",
+    });
   }, [deleteCb, deleteItemMutation, id]);
 
   const getSignedUrl = useCallback(async () => {
@@ -88,13 +87,25 @@ export const ListItem = ({
     return "red";
   }, [remainingTime]);
 
+  const descriptionText = useMemo(() => {
+    return (
+      dayjs(expired_at).format("DD/MM/YYYY") +
+      (note ? ` - ${note}` : "") +
+      (description ? ` - ${description}` : "")
+    );
+  }, [description, expired_at, note]);
+
   return (
     <>
       <SwipeAction
         rightActions={[
           {
             key: "delete",
-            text: "Delete",
+            text: (
+              <Space className="items-center">
+                <DeleteOutline /> Delete
+              </Space>
+            ),
             color: "danger",
             onClick: actionDeleteClick,
           },
@@ -111,8 +122,17 @@ export const ListItem = ({
               />
             </Badge>
           }
-          description={description}
+          description={descriptionText}
           title={location}
+          extra={
+            remainingTime <= 0 ? (
+              <span className="text-red-600 font-semibold text-xs">
+                Expired
+              </span>
+            ) : (
+              ""
+            )
+          }
         >
           {name}
         </List.Item>
