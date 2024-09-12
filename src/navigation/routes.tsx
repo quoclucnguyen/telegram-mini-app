@@ -2,7 +2,7 @@ import type { ComponentType, JSX } from "react";
 
 import { IndexPage } from "@/pages/IndexPage/IndexPage";
 import { InitDataPage } from "@/pages/InitDataPage/InitDataPage";
-import { ItemsPage } from "@/pages/ItemsPage/ItemsPage";
+import ItemsPage from "@/pages/ItemsPage/ItemsPage";
 import { LaunchParamsPage } from "@/pages/LaunchParamsPage/LaunchParamsPage";
 import { ThemeParamsPage } from "@/pages/ThemeParamsPage/ThemeParamsPage";
 
