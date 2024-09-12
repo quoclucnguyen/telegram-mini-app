@@ -72,7 +72,7 @@ export const useGetItemsMutation = (category: CategoryEnum) => {
       const itemsQuery = supabase
         .from("item")
         .select(
-          `id, name, location, bucket, path, expired_at, description, note, status`,
+          `id, name, location, bucket, path, expired_at, description, note, status, category`,
         )
         .eq("category", category)
         .or(
@@ -93,6 +93,20 @@ export const useGetItemsMutation = (category: CategoryEnum) => {
       const items: Item = data;
 
       return items;
+    },
+  });
+};
+
+export const useAteItemCategoryFoodMutation = () => {
+  return useMutation({
+    mutationKey: ["ateItemCategoryFood"],
+
+    mutationFn: async (id: number) => {
+      const res = await supabase
+        .from("item")
+        .update({ status: "ate" })
+        .eq("id", id);
+      return res.data;
     },
   });
 };

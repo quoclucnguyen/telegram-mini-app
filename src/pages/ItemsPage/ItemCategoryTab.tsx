@@ -1,4 +1,3 @@
-import { ListItem } from "@/components/ListItem/ListItem";
 import {
   FloatingBubble,
   InfiniteScroll,
@@ -10,6 +9,7 @@ import { AddCircleOutline } from "antd-mobile-icons";
 import { useCallback, useEffect, useState } from "react";
 import { CategoryEnum, ItemInterface } from "./interface";
 import ItemPopup from "./ItemPopup";
+import { ListItem } from "./ListItem";
 import { useGetItemsMutation } from "./service";
 
 export interface ItemCategoryTabProps {
@@ -36,7 +36,7 @@ const ItemsPageCategoryTab = ({
       keyword: debouncedSearchTerm,
     });
     if (append) {
-      setData((val) => [...val, ...append]);
+      setData((val) => [...val, ...(append as ItemInterface[])]);
     }
     setHasMore((append?.length ?? 0) > 0);
     setOffset((val) => val + 5);

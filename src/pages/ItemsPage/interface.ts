@@ -23,4 +23,5 @@ export interface ItemInterface {
   location?: "dry" | "wet" | "refrigerator" | "freezer";
   note: string | null;
   expired_at: string | null;
+  category: CategoryEnum | null;
 }
