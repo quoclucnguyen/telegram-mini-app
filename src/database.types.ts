@@ -79,6 +79,7 @@ export type Database = {
       item: {
         Row: {
           bucket: string | null;
+          category: Database["public"]["Enums"]["item_category_enum"] | null;
           created_at: string | null;
           description: string | null;
           expired_at: string | null;
@@ -92,6 +93,7 @@ export type Database = {
         };
         Insert: {
           bucket?: string | null;
+          category?: Database["public"]["Enums"]["item_category_enum"] | null;
           created_at?: string | null;
           description?: string | null;
           expired_at?: string | null;
@@ -105,6 +107,7 @@ export type Database = {
         };
         Update: {
           bucket?: string | null;
+          category?: Database["public"]["Enums"]["item_category_enum"] | null;
           created_at?: string | null;
           description?: string | null;
           expired_at?: string | null;
@@ -118,6 +121,33 @@ export type Database = {
         };
         Relationships: [];
       };
+      user: {
+        Row: {
+          created_at: string;
+          first_name: string | null;
+          id: number;
+          last_name: string | null;
+          telegram_user_id: number;
+          username: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          first_name?: string | null;
+          id?: number;
+          last_name?: string | null;
+          telegram_user_id: number;
+          username?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          first_name?: string | null;
+          id?: number;
+          last_name?: string | null;
+          telegram_user_id?: number;
+          username?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -126,6 +156,7 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
+      item_category_enum: "foods" | "cosmetics" | "others";
       item_status_enum: "out_date" | "ate";
       location_enum: "dry" | "wet" | "refrigerator" | "freezer";
     };
