@@ -6,8 +6,7 @@ import {
   ImageUploader,
   Input,
   Popup,
-  Radio,
-  Space,
+  Selector,
   TextArea,
 } from "antd-mobile";
 import dayjs from "dayjs";
@@ -80,6 +79,8 @@ const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
   const formSubmit = useCallback(
     async (values: FormFields) => {
       delete values.file;
+      const location = values.location?.[0] ?? "dry";
+      delete values.location;
 
       const bucket = "items";
       let path = undefined;
@@ -98,6 +99,7 @@ const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
 
       await createItemMutation.mutateAsync({
         ...values,
+        location,
         bucket,
         path,
         expired_at: expiredAt
@@ -144,15 +146,13 @@ const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
               },
             ]}
           >
-            <Radio.Group defaultValue="1">
-              <Space direction="vertical">
-                {["dry", "wet", "refrigerator", "freezer"].map((item) => (
-                  <Radio key={item} value={item}>
-                    {item}
-                  </Radio>
-                ))}
-              </Space>
-            </Radio.Group>
+            <Selector
+              options={["dry", "wet", "refrigerator", "freezer"].map(
+                (value) => {
+                  return { label: value, value };
+                },
+              )}
+            />
           </Form.Item>
 
           <Form.Item label="Description" name="description">
