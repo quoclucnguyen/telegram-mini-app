@@ -4,10 +4,11 @@ import {
   InfiniteScroll,
   List,
   PullToRefresh,
+  SearchBar,
 } from "antd-mobile";
 import { AddCircleOutline } from "antd-mobile-icons";
 import dayjs from "dayjs";
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import ItemPopup from "./ItemPopup";
 import { useGetItemsMutation } from "./service";
 
@@ -16,32 +17,68 @@ export const ItemsPage: FC = () => {
   const [data, setData] = useState<ItemInterface[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
   const getItemsMutation = useGetItemsMutation();
 
   const loadMore = useCallback(async () => {
-    const append = await getItemsMutation.mutateAsync({ take: 5, offset });
+    const append = await getItemsMutation.mutateAsync({
+      take: 5,
+      offset,
+      keyword: debouncedSearchTerm,
+    });
     if (append) {
       setData((val) => [...val, ...append]);
     }
     setHasMore((append?.length ?? 0) > 0);
     setOffset((val) => val + 5);
-  }, [getItemsMutation, offset]);
+  }, [debouncedSearchTerm, getItemsMutation, offset]);
 
   const onOpen = useCallback(() => {
     setOpenModal(true);
   }, []);
 
+  const debouncedSetSearchTerm = useCallback((value: string) => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(value);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleChange = (value: string): void => {
+    debouncedSetSearchTerm(value);
+  };
+
+  useEffect(() => {
+    if (debouncedSearchTerm.length > 0) {
+      Promise.all([setOffset(0)]);
+      setData([]);
+      setHasMore(true);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearchTerm]);
+
+  const reset = useCallback(async () => {
+    setOffset(0);
+    setData([]);
+    setHasMore(true);
+  }, []);
+
   return (
     <>
-      <PullToRefresh
-        onRefresh={async () => {
-          Promise.all([setOffset(0)]);
-          setData([]);
-          setHasMore(true);
-        }}
-      >
-        <List header="Items" className="w-full">
+      <PullToRefresh onRefresh={reset}>
+        <SearchBar
+          placeholder="Search"
+          style={{ "--border-radius": "0px" }}
+          onChange={handleChange}
+          onClear={() => {
+            setDebouncedSearchTerm("");
+            reset();
+          }}
+        />
+        <List className="w-full">
           {data.length > 0 ? (
             data.map(
               ({
