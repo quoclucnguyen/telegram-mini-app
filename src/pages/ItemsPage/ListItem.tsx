@@ -1,7 +1,10 @@
 import { formatTime } from "@/common/helper";
 import { createSignedUrl } from "@/common/storage";
-import { ItemInterface } from "@/pages/ItemsPage/interface";
-import { useDeleteItemMutation } from "@/pages/ItemsPage/service";
+import { CategoryEnum, ItemInterface } from "@/pages/ItemsPage/interface";
+import {
+  useAteItemCategoryFoodMutation,
+  useDeleteItemMutation,
+} from "@/pages/ItemsPage/service";
 import {
   Badge,
   Image,
@@ -11,7 +14,7 @@ import {
   Space,
   SwipeAction,
 } from "antd-mobile";
-import { DeleteOutline } from "antd-mobile-icons";
+import { CloseOutline, DeleteOutline } from "antd-mobile-icons";
 import dayjs from "dayjs";
 import {
   useCallback,
@@ -35,6 +38,7 @@ export const ListItem = ({ item, deleteCb }: ItemProps) => {
   const [remainingTime, setRemainingTime] = useState(0);
 
   const deleteItemMutation = useDeleteItemMutation();
+  const ateItemCategoryFoodMutation = useAteItemCategoryFoodMutation();
 
   const actionDeleteClick = useCallback(async () => {
     Modal.confirm({
@@ -107,6 +111,10 @@ export const ListItem = ({ item, deleteCb }: ItemProps) => {
     );
   }, [description, expired_at, note]);
 
+  const actionAteClick = useCallback(async () => {
+    await ateItemCategoryFoodMutation.mutateAsync(id);
+  }, [ateItemCategoryFoodMutation, id]);
+
   return (
     <>
       <SwipeAction
@@ -122,6 +130,22 @@ export const ListItem = ({ item, deleteCb }: ItemProps) => {
             onClick: actionDeleteClick,
           },
         ]}
+        leftActions={
+          item.category === CategoryEnum.FOODS
+            ? [
+                {
+                  key: "ate",
+                  text: (
+                    <Space className="items-center">
+                      <CloseOutline /> Ate
+                    </Space>
+                  ),
+                  color: "success",
+                  onClick: actionAteClick,
+                },
+              ]
+            : undefined
+        }
       >
         <List.Item
           prefix={
