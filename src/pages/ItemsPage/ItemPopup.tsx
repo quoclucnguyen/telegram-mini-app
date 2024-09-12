@@ -12,16 +12,22 @@ import {
 import dayjs from "dayjs";
 import pica from "pica";
 import { useCallback, useState } from "react";
-import { FormFields } from "./interface";
+import { CategoryEnum, FormFields } from "./interface";
 import { useCreateItemMutation } from "./service";
 
 interface ItemPopupProps {
   openModal: boolean;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
   cb: () => void;
+  category: CategoryEnum;
 }
 
-const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
+const ItemPopup = ({
+  openModal,
+  setOpenModal,
+  cb,
+  category,
+}: ItemPopupProps) => {
   const [form] = Form.useForm();
   const [imageUploadFile, setImageUploadFile] = useState<File | undefined>();
   const [calendarPickerVisible, setCalendarPickerVisible] =
@@ -102,6 +108,7 @@ const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
         location,
         bucket,
         path,
+        category,
         expired_at: expiredAt
           ? dayjs(expiredAt)
               .set("hour", 23)
@@ -119,6 +126,7 @@ const ItemPopup = ({ openModal, setOpenModal, cb }: ItemPopupProps) => {
       cb?.();
     },
     [
+      category,
       cb,
       createItemMutation,
       expiredAt,

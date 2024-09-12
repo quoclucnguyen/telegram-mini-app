@@ -6,3 +6,9 @@ export interface FormFields {
   expiredAt: string;
   file?: File;
 }
+
+export enum CategoryEnum {
+  FOODS = "foods",
+  COSMETICS = "cosmetics",
+  OTHERS = "others",
+}

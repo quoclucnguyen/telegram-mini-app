@@ -1,149 +1,62 @@
-import { ItemInterface, ListItem } from "@/components/ListItem/ListItem";
+import { Space, Tabs } from "antd-mobile";
 import {
-  FloatingBubble,
-  InfiniteScroll,
-  List,
-  PullToRefresh,
-  SearchBar,
-} from "antd-mobile";
-import { AddCircleOutline } from "antd-mobile-icons";
-import dayjs from "dayjs";
-import { FC, useCallback, useEffect, useState } from "react";
-import ItemPopup from "./ItemPopup";
-import { useGetItemsMutation } from "./service";
+  ContentOutline,
+  CouponOutline,
+  FolderOutline,
+} from "antd-mobile-icons";
+import { useState } from "react";
+import ItemsPageCategoryTab from "./ItemCategoryTab";
+import { CategoryEnum } from "./interface";
 
-export const ItemsPage: FC = () => {
-  const [openModal, setOpenModal] = useState(false);
-  const [data, setData] = useState<ItemInterface[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [offset, setOffset] = useState(0);
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-
-  const getItemsMutation = useGetItemsMutation();
-
-  const loadMore = useCallback(async () => {
-    const append = await getItemsMutation.mutateAsync({
-      take: 5,
-      offset,
-      keyword: debouncedSearchTerm,
-    });
-    if (append) {
-      setData((val) => [...val, ...append]);
-    }
-    setHasMore((append?.length ?? 0) > 0);
-    setOffset((val) => val + 5);
-  }, [debouncedSearchTerm, getItemsMutation, offset]);
-
-  const onOpen = useCallback(() => {
-    setOpenModal(true);
-  }, []);
-
-  const debouncedSetSearchTerm = useCallback((value: string) => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(value);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleChange = (value: string): void => {
-    debouncedSetSearchTerm(value);
-  };
-
-  useEffect(() => {
-    if (debouncedSearchTerm.length > 0) {
-      Promise.all([setOffset(0)]);
-      setData([]);
-      setHasMore(true);
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearchTerm]);
-
-  const reset = useCallback(async () => {
-    setOffset(0);
-    setData([]);
-    setHasMore(true);
-  }, []);
+const ItemsPage = () => {
+  const [activeKey, setActiveKey] = useState(CategoryEnum.FOODS);
 
   return (
-    <>
-      <PullToRefresh onRefresh={reset}>
-        <SearchBar
-          placeholder="Search"
-          style={{ "--border-radius": "0px" }}
-          onChange={handleChange}
-          onClear={() => {
-            setDebouncedSearchTerm("");
-            reset();
-          }}
-        />
-        <List className="w-full">
-          {data.length > 0 ? (
-            data.map(
-              ({
-                id,
-                name,
-                bucket,
-                path,
-                note,
-                expired_at,
-                status,
-                location,
-              }) => {
-                const description =
-                  dayjs(expired_at).format("DD/MM-YYYY") +
-                  (note ? ` - ${note}` : "");
-
-                return (
-                  <ListItem
-                    key={id}
-                    name={name}
-                    bucket={bucket}
-                    path={path}
-                    id={id}
-                    deleteCb={() => {
-                      setData((val) => val.filter((v) => v.id !== id));
-                    }}
-                    description={description}
-                    expired_at={expired_at}
-                    status={status}
-                    location={location}
-                    note={null}
-                  />
-                );
-              },
-            )
-          ) : (
-            <List.Item>No items found</List.Item>
-          )}
-        </List>
-
-        <InfiniteScroll loadMore={loadMore} hasMore={hasMore} />
-      </PullToRefresh>
-
-      <ItemPopup
-        cb={async () => {
-          Promise.all([setOffset(0)]);
-          setData([]);
-          setHasMore(true);
-        }}
-        openModal={openModal}
-        setOpenModal={setOpenModal}
-      />
-
-      <FloatingBubble
-        style={{
-          "--initial-position-bottom": "10px",
-          "--initial-position-right": "10px",
-          "--edge-distance": "24px",
-        }}
-        onClick={() => {
-          onOpen();
-        }}
-      >
-        <AddCircleOutline fontSize={32} />
-      </FloatingBubble>
-    </>
+    <Tabs
+      style={{
+        "--title-font-size": "14px",
+        "--content-padding": "0px",
+      }}
+      activeLineMode="auto"
+      activeKey={activeKey}
+      onChange={(key) => setActiveKey(key as CategoryEnum)}
+    >
+      {[
+        {
+          key: CategoryEnum.FOODS,
+          title: (
+            <Space className="items-center">
+              <CouponOutline /> Foods
+            </Space>
+          ),
+        },
+        {
+          key: CategoryEnum.COSMETICS,
+          title: (
+            <Space className="items-center">
+              <ContentOutline /> Cosmetics
+            </Space>
+          ),
+        },
+        {
+          key: CategoryEnum.OTHERS,
+          title: (
+            <Space className="items-center">
+              <FolderOutline /> Others
+            </Space>
+          ),
+        },
+      ].map(({ key, title }) => (
+        <Tabs.Tab key={key} title={title}>
+          <ItemsPageCategoryTab
+            key={key}
+            category={key}
+            activeKey={activeKey}
+          />
+        </Tabs.Tab>
+      ))}
+    </Tabs>
   );
 };
+
+export default ItemsPage;

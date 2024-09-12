@@ -1,4 +1,4 @@
-import { ItemsPage } from "@/pages/ItemsPage/ItemsPage";
+import ItemsPage from "@/pages/ItemsPage/ItemsPage";
 import { useIntegration } from "@telegram-apps/react-router-integration";
 import {
   bindMiniAppCSSVars,
