@@ -38,13 +38,25 @@ export const ListItem = ({ item, deleteCb }: ItemProps) => {
 
   const actionDeleteClick = useCallback(async () => {
     Modal.confirm({
-      content: "Are you sure you want to delete this item?",
+      content: (
+        <div className="text-center">
+          Are you sure you want to delete this item?
+        </div>
+      ),
       onConfirm: async () => {
         await deleteItemMutation.mutateAsync(id);
         deleteCb?.();
       },
       confirmText: "Delete",
       cancelText: "Cancel",
+      header: (
+        <DeleteOutline
+          style={{
+            fontSize: 42,
+            color: "var(--adm-color-danger)",
+          }}
+        />
+      ),
     });
   }, [deleteCb, deleteItemMutation, id]);
 
