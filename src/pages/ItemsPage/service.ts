@@ -74,10 +74,10 @@ export const useGetItemsMutation = () => {
         )
         .or(
           `name.ilike.%${
-            keyword?.toLocaleLowerCase() ?? ""
-          }%,description.ilike.%${keyword ?? ""}%,note.ilike.%${
-            keyword ?? ""
-          }%`,
+            keyword?.trim().toLocaleLowerCase() ?? ""
+          }%,description.ilike.%${
+            keyword?.trim().toLocaleLowerCase() ?? ""
+          }%,note.ilike.%${keyword?.trim().toLocaleLowerCase() ?? ""}%`,
         )
         .order("expired_at", { ascending: true })
         .range(offset, offset + take - 1);
