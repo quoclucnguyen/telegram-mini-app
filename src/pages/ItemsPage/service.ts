@@ -58,11 +58,26 @@ export const useGetItemsMutation = () => {
   return useMutation({
     mutationKey: ["items"],
 
-    mutationFn: async ({ take, offset }: { take: number; offset: number }) => {
+    mutationFn: async ({
+      take,
+      offset,
+      keyword,
+    }: {
+      take: number;
+      offset: number;
+      keyword?: string;
+    }) => {
       const itemsQuery = supabase
         .from("item")
         .select(
           `id, name, location, bucket, path, expired_at, description, note, status`,
+        )
+        .or(
+          `name.ilike.%${
+            keyword?.toLocaleLowerCase() ?? ""
+          }%,description.ilike.%${keyword ?? ""}%,note.ilike.%${
+            keyword ?? ""
+          }%`,
         )
         .order("expired_at", { ascending: true })
         .range(offset, offset + take - 1);
