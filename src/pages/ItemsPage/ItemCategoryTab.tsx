@@ -12,7 +12,10 @@ import { useCategoryTabFilterStore } from "./hook";
 import { CategoryEnum, ItemInterface } from "./interface";
 import ItemPopup from "./ItemPopup";
 import { ListItem } from "./ListItem";
-import { useGetItemsMutation } from "./service";
+import {
+  useCountItemsByCategoryByExpiredAtQuery,
+  useGetItemsMutation,
+} from "./service";
 
 export interface ItemCategoryTabProps {
   category: CategoryEnum;
@@ -31,6 +34,26 @@ const ItemsPageCategoryTab = ({
   const [offset, setOffset] = useState(0);
   const { filter } = useCategoryTabFilterStore();
 
+  const countGoodQuery = useCountItemsByCategoryByExpiredAtQuery(
+    category,
+    "good",
+    filter,
+  );
+  const countSoonQuery = useCountItemsByCategoryByExpiredAtQuery(
+    category,
+    "soon",
+    filter,
+  );
+  const countTodayQuery = useCountItemsByCategoryByExpiredAtQuery(
+    category,
+    "today",
+    filter,
+  );
+  const countExpiredQuery = useCountItemsByCategoryByExpiredAtQuery(
+    category,
+    "expired",
+    filter,
+  );
   const getItemsMutation = useGetItemsMutation(category);
 
   const loadMore = useCallback(async () => {
@@ -75,25 +98,25 @@ const ItemsPageCategoryTab = ({
       <Grid className="mx-3 my-2 text-center" columns={4}>
         <Grid.Item>
           <Tag color="success" fill="outline">
-            10 good
+            {countGoodQuery.data} good
           </Tag>
         </Grid.Item>
 
         <Grid.Item>
           <Tag color="warning" fill="outline">
-            10 soon
+            {countSoonQuery.data} soon
           </Tag>
         </Grid.Item>
 
         <Grid.Item>
           <Tag color="danger" fill="outline">
-            10 today
+            {countTodayQuery.data} today
           </Tag>
         </Grid.Item>
 
         <Grid.Item>
           <Tag color="default" fill="outline">
-            10 expired
+            {countExpiredQuery.data} expired
           </Tag>
         </Grid.Item>
       </Grid>

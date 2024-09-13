@@ -1,6 +1,7 @@
 import { supabase } from "@/supabase";
 import { QueryData } from "@supabase/supabase-js";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
 import { CategoryEnum } from "./interface";
 
 export const useItemsQuery = (take = 5, offset = 0) => {
@@ -137,16 +138,21 @@ export const useCountItemsByCategoryQuery = (
 
 export const useCountItemsByCategoryByExpiredAtQuery = (
   category: CategoryEnum,
+  expiredStatus: "expired" | "good" | "today" | "soon",
   keyword?: string,
 ) => {
   return useQuery({
-    queryKey: ["countItemsByCategoryByExpiredAt", category, keyword],
+    queryKey: [
+      "countItemsByCategoryByExpiredAt",
+      category,
+      expiredStatus,
+      keyword,
+    ],
     queryFn: async () => {
-      const result = await supabase
+      const query = supabase
         .from("item")
         .select("*", { count: "exact", head: true })
         .eq("category", category)
-        .gt("expired_at", new Date().toISOString())
         .or(
           `name.ilike.%${
             keyword?.trim().toLocaleLowerCase() ?? ""
@@ -154,6 +160,43 @@ export const useCountItemsByCategoryByExpiredAtQuery = (
             keyword?.trim().toLocaleLowerCase() ?? ""
           }%,note.ilike.%${keyword?.trim().toLocaleLowerCase() ?? ""}%`,
         );
+
+      const threeDaysLater = dayjs()
+        .add(3, "day")
+        .set("hour", 23)
+        .set("minutes", 59)
+        .set("seconds", 59);
+
+      const today = dayjs()
+        .set("hour", 23)
+        .set("minutes", 59)
+        .set("seconds", 59);
+
+      switch (expiredStatus) {
+        case "good": {
+          query.gte("expired_at", threeDaysLater.toISOString());
+          break;
+        }
+
+        case "soon": {
+          query.lte("expired_at", threeDaysLater.toISOString());
+          query.gte("expired_at", today.subtract(1, "day").toISOString());
+          break;
+        }
+
+        case "today": {
+          query.gte("expired_at", today.toISOString());
+          query.lte("expired_at", today.add(1, "day").toISOString());
+          break;
+        }
+
+        case "expired": {
+          query.lte("expired_at", today.toISOString());
+          break;
+        }
+      }
+
+      const result = await query;
 
       return result.count;
     },
