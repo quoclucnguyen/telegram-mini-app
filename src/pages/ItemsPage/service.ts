@@ -163,35 +163,35 @@ export const useCountItemsByCategoryByExpiredAtQuery = (
 
       const threeDaysLater = dayjs()
         .add(3, "day")
-        .set("hour", 23)
-        .set("minutes", 59)
-        .set("seconds", 59);
+        .set("hour", 0)
+        .set("minutes", 0)
+        .set("seconds", 0);
 
-      const today = dayjs()
-        .set("hour", 23)
-        .set("minutes", 59)
-        .set("seconds", 59);
+      const today = dayjs().set("hour", 0).set("minutes", 0).set("seconds", 0);
 
       switch (expiredStatus) {
         case "good": {
           query.gte("expired_at", threeDaysLater.toISOString());
+
           break;
         }
 
         case "soon": {
-          query.lte("expired_at", threeDaysLater.toISOString());
-          query.gte("expired_at", today.add(1, "day").toISOString());
+          query
+            .gt("expired_at", today.add(1, "day").toISOString())
+            .lte("expired_at", threeDaysLater.toISOString());
+
           break;
         }
 
         case "today": {
-          query.gte("expired_at", today.subtract(1, "day").toISOString());
-          query.lte("expired_at", today.toISOString());
+          query.gt("expired_at", today.toISOString());
+          query.lt("expired_at", today.add(1, "day").toISOString());
           break;
         }
 
         case "expired": {
-          query.gt("expired_at", today.toISOString());
+          query.lt("expired_at", today.toISOString());
           break;
         }
       }

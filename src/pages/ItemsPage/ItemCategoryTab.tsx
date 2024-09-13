@@ -54,6 +54,7 @@ const ItemsPageCategoryTab = ({
     "expired",
     filter,
   );
+
   const getItemsMutation = useGetItemsMutation(category);
 
   const loadMore = useCallback(async () => {
