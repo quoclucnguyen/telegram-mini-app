@@ -1,8 +1,10 @@
 import {
   FloatingBubble,
+  Grid,
   InfiniteScroll,
   List,
   PullToRefresh,
+  Tag,
 } from "antd-mobile";
 import { AddCircleOutline } from "antd-mobile-icons";
 import { useCallback, useEffect, useState } from "react";
@@ -15,11 +17,13 @@ import { useGetItemsMutation } from "./service";
 export interface ItemCategoryTabProps {
   category: CategoryEnum;
   activeKey: CategoryEnum;
+  popupSubmitCb: () => void;
 }
 
 const ItemsPageCategoryTab = ({
   category,
   activeKey,
+  popupSubmitCb,
 }: ItemCategoryTabProps) => {
   const [openModal, setOpenModal] = useState(false);
   const [data, setData] = useState<ItemInterface[]>([]);
@@ -68,6 +72,31 @@ const ItemsPageCategoryTab = ({
 
   return (
     <>
+      <Grid className="mx-3 my-2 text-center" columns={4}>
+        <Grid.Item>
+          <Tag color="success" fill="outline">
+            10 good
+          </Tag>
+        </Grid.Item>
+
+        <Grid.Item>
+          <Tag color="warning" fill="outline">
+            10 soon
+          </Tag>
+        </Grid.Item>
+
+        <Grid.Item>
+          <Tag color="danger" fill="outline">
+            10 today
+          </Tag>
+        </Grid.Item>
+
+        <Grid.Item>
+          <Tag color="default" fill="outline">
+            10 expired
+          </Tag>
+        </Grid.Item>
+      </Grid>
       <PullToRefresh onRefresh={reset}>
         <List className="w-full">
           {data.length > 0 ? (
@@ -95,6 +124,7 @@ const ItemsPageCategoryTab = ({
           Promise.all([setOffset(0)]);
           setData([]);
           setHasMore(true);
+          popupSubmitCb();
         }}
         openModal={openModal}
         setOpenModal={setOpenModal}

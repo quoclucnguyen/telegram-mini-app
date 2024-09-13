@@ -8,6 +8,7 @@ import {
   Popup,
   Selector,
   TextArea,
+  Toast,
 } from "antd-mobile";
 import dayjs from "dayjs";
 import pica from "pica";
@@ -91,6 +92,11 @@ const ItemPopup = ({
       const bucket = "items";
       let path = undefined;
 
+      if (!expiredAt) {
+        Toast.show("Please select expired date");
+        return;
+      }
+
       if (imageUploadFile) {
         const { path: resultPath } = await uploadFile(
           await resizeImage(imageUploadFile),
@@ -141,7 +147,7 @@ const ItemPopup = ({
     <Popup visible={openModal} onMaskClick={() => setOpenModal(false)}>
       <div style={{ height: "60vh", overflowY: "scroll" }}>
         <Form layout="vertical" form={form} onFinish={formSubmit}>
-          <Form.Item label="Name" name="name">
+          <Form.Item label="Name" name="name" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
 
@@ -186,6 +192,11 @@ const ItemPopup = ({
           <Form.Item
             label="Expired at"
             onClick={() => setCalendarPickerVisible(true)}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
           >
             <Input
               disabled

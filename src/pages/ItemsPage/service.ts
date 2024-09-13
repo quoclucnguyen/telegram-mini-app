@@ -134,3 +134,28 @@ export const useCountItemsByCategoryQuery = (
     },
   });
 };
+
+export const useCountItemsByCategoryByExpiredAtQuery = (
+  category: CategoryEnum,
+  keyword?: string,
+) => {
+  return useQuery({
+    queryKey: ["countItemsByCategoryByExpiredAt", category, keyword],
+    queryFn: async () => {
+      const result = await supabase
+        .from("item")
+        .select("*", { count: "exact", head: true })
+        .eq("category", category)
+        .gt("expired_at", new Date().toISOString())
+        .or(
+          `name.ilike.%${
+            keyword?.trim().toLocaleLowerCase() ?? ""
+          }%,description.ilike.%${
+            keyword?.trim().toLocaleLowerCase() ?? ""
+          }%,note.ilike.%${keyword?.trim().toLocaleLowerCase() ?? ""}%`,
+        );
+
+      return result.count;
+    },
+  });
+};

@@ -37,12 +37,9 @@ const ItemsPage = () => {
     if (activeKey === CategoryEnum.OTHERS) {
       countItemOthersQuery.refetch();
     }
-  }, [
-    activeKey,
-    countItemCosmeticsQuery,
-    countItemFoodsQuery,
-    countItemOthersQuery,
-  ]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeKey]);
 
   const debouncedSetSearchTerm = useCallback(
     (value: string) => {
@@ -84,7 +81,7 @@ const ItemsPage = () => {
             key: CategoryEnum.FOODS,
             title: (
               <Space className="items-center">
-                <CouponOutline /> Foods{" "}
+                <CouponOutline /> Foods
                 <span>({countItemFoodsQuery.data})</span>
               </Space>
             ),
@@ -93,7 +90,7 @@ const ItemsPage = () => {
             key: CategoryEnum.COSMETICS,
             title: (
               <Space className="items-center">
-                <ContentOutline /> Cosmetics{" "}
+                <ContentOutline /> Cosmetics
                 <span>({countItemCosmeticsQuery.data})</span>
               </Space>
             ),
@@ -102,7 +99,7 @@ const ItemsPage = () => {
             key: CategoryEnum.OTHERS,
             title: (
               <Space className="items-center">
-                <FolderOutline /> Others{" "}
+                <FolderOutline /> Others
                 <span>({countItemOthersQuery.data})</span>
               </Space>
             ),
@@ -113,6 +110,17 @@ const ItemsPage = () => {
               key={key}
               category={key}
               activeKey={activeKey}
+              popupSubmitCb={() => {
+                if (activeKey === CategoryEnum.FOODS) {
+                  countItemFoodsQuery.refetch();
+                }
+                if (activeKey === CategoryEnum.COSMETICS) {
+                  countItemCosmeticsQuery.refetch();
+                }
+                if (activeKey === CategoryEnum.OTHERS) {
+                  countItemOthersQuery.refetch();
+                }
+              }}
             />
           </Tabs.Tab>
         ))}
