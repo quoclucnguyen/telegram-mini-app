@@ -116,7 +116,7 @@ export const useCountItemsByCategoryQuery = (
   keyword?: string,
 ) => {
   return useQuery({
-    queryKey: ["countItemsByCategory", category],
+    queryKey: ["countItemsByCategory", category, keyword],
     queryFn: async () => {
       const result = await supabase
         .from("item")
