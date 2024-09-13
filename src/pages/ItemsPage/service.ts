@@ -113,7 +113,7 @@ export const useAteItemCategoryFoodMutation = () => {
 
 export const useCountItemsByCategoryQuery = (
   category: CategoryEnum,
-  enabled?: boolean,
+  keyword?: string,
 ) => {
   return useQuery({
     queryKey: ["countItemsByCategory", category],
@@ -121,10 +121,16 @@ export const useCountItemsByCategoryQuery = (
       const result = await supabase
         .from("item")
         .select("*", { count: "exact", head: true })
-        .eq("category", category);
+        .eq("category", category)
+        .or(
+          `name.ilike.%${
+            keyword?.trim().toLocaleLowerCase() ?? ""
+          }%,description.ilike.%${
+            keyword?.trim().toLocaleLowerCase() ?? ""
+          }%,note.ilike.%${keyword?.trim().toLocaleLowerCase() ?? ""}%`,
+        );
 
       return result.count;
     },
-    enabled,
   });
 };

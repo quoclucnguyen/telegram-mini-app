@@ -3,10 +3,10 @@ import {
   InfiniteScroll,
   List,
   PullToRefresh,
-  SearchBar,
 } from "antd-mobile";
 import { AddCircleOutline } from "antd-mobile-icons";
 import { useCallback, useEffect, useState } from "react";
+import { useCategoryTabFilterStore } from "./hook";
 import { CategoryEnum, ItemInterface } from "./interface";
 import ItemPopup from "./ItemPopup";
 import { ListItem } from "./ListItem";
@@ -25,7 +25,7 @@ const ItemsPageCategoryTab = ({
   const [data, setData] = useState<ItemInterface[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const { filter } = useCategoryTabFilterStore();
 
   const getItemsMutation = useGetItemsMutation(category);
 
@@ -33,30 +33,18 @@ const ItemsPageCategoryTab = ({
     const append = await getItemsMutation.mutateAsync({
       take: 5,
       offset,
-      keyword: debouncedSearchTerm,
+      keyword: filter,
     });
     if (append) {
       setData((val) => [...val, ...(append as ItemInterface[])]);
     }
     setHasMore((append?.length ?? 0) > 0);
     setOffset((val) => val + 5);
-  }, [debouncedSearchTerm, getItemsMutation, offset]);
+  }, [filter, getItemsMutation, offset]);
 
   const onOpen = useCallback(() => {
     setOpenModal(true);
   }, []);
-
-  const debouncedSetSearchTerm = useCallback((value: string) => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(value);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleChange = (value: string): void => {
-    debouncedSetSearchTerm(value);
-  };
 
   useEffect(() => {
     Promise.all([setOffset(0)]);
@@ -64,7 +52,7 @@ const ItemsPageCategoryTab = ({
     setHasMore(true);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearchTerm]);
+  }, [filter]);
 
   const reset = useCallback(async () => {
     setOffset(0);
@@ -81,15 +69,6 @@ const ItemsPageCategoryTab = ({
   return (
     <>
       <PullToRefresh onRefresh={reset}>
-        <SearchBar
-          placeholder="Search"
-          style={{ "--border-radius": "0px" }}
-          onChange={handleChange}
-          onClear={() => {
-            setDebouncedSearchTerm("");
-            reset();
-          }}
-        />
         <List className="w-full">
           {data.length > 0 ? (
             data.map((item) => {
