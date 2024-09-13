@@ -180,18 +180,18 @@ export const useCountItemsByCategoryByExpiredAtQuery = (
 
         case "soon": {
           query.lte("expired_at", threeDaysLater.toISOString());
-          query.gte("expired_at", today.subtract(1, "day").toISOString());
+          query.gte("expired_at", today.add(1, "day").toISOString());
           break;
         }
 
         case "today": {
-          query.gte("expired_at", today.toISOString());
-          query.lte("expired_at", today.add(1, "day").toISOString());
+          query.gte("expired_at", today.subtract(1, "day").toISOString());
+          query.lte("expired_at", today.toISOString());
           break;
         }
 
         case "expired": {
-          query.lte("expired_at", today.toISOString());
+          query.gt("expired_at", today.toISOString());
           break;
         }
       }

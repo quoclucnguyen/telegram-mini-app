@@ -85,13 +85,19 @@ const ItemsPageCategoryTab = ({
     setOffset(0);
     setData([]);
     setHasMore(true);
-  }, []);
+    countExpiredQuery.refetch();
+    countGoodQuery.refetch();
+    countSoonQuery.refetch();
+    countTodayQuery.refetch();
+  }, [countExpiredQuery, countGoodQuery, countSoonQuery, countTodayQuery]);
 
   useEffect(() => {
     if (activeKey === category) {
       reset();
     }
-  }, [reset, activeKey, category]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeKey, category]);
 
   return (
     <>
@@ -129,6 +135,8 @@ const ItemsPageCategoryTab = ({
                   key={item.id}
                   deleteCb={() => {
                     setData((val) => val.filter((v) => v.id !== item.id));
+                    reset();
+                    popupSubmitCb();
                   }}
                   item={item}
                 />
@@ -144,9 +152,7 @@ const ItemsPageCategoryTab = ({
 
       <ItemPopup
         cb={async () => {
-          Promise.all([setOffset(0)]);
-          setData([]);
-          setHasMore(true);
+          reset();
           popupSubmitCb();
         }}
         openModal={openModal}
