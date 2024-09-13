@@ -4,12 +4,38 @@ import {
   CouponOutline,
   FolderOutline,
 } from "antd-mobile-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ItemsPageCategoryTab from "./ItemCategoryTab";
 import { CategoryEnum } from "./interface";
+import { useCountItemsByCategoryQuery } from "./service";
 
 const ItemsPage = () => {
   const [activeKey, setActiveKey] = useState(CategoryEnum.FOODS);
+
+  const countItemFoodsQuery = useCountItemsByCategoryQuery(CategoryEnum.FOODS);
+  const countItemCosmeticsQuery = useCountItemsByCategoryQuery(
+    CategoryEnum.COSMETICS,
+  );
+  const countItemOthersQuery = useCountItemsByCategoryQuery(
+    CategoryEnum.OTHERS,
+  );
+
+  useEffect(() => {
+    if (activeKey === CategoryEnum.FOODS) {
+      countItemFoodsQuery.refetch();
+    }
+    if (activeKey === CategoryEnum.COSMETICS) {
+      countItemCosmeticsQuery.refetch();
+    }
+    if (activeKey === CategoryEnum.OTHERS) {
+      countItemOthersQuery.refetch();
+    }
+  }, [
+    activeKey,
+    countItemCosmeticsQuery,
+    countItemFoodsQuery,
+    countItemOthersQuery,
+  ]);
 
   return (
     <Tabs
@@ -26,7 +52,7 @@ const ItemsPage = () => {
           key: CategoryEnum.FOODS,
           title: (
             <Space className="items-center">
-              <CouponOutline /> Foods
+              <CouponOutline /> Foods <span>({countItemFoodsQuery.data})</span>
             </Space>
           ),
         },
@@ -34,7 +60,8 @@ const ItemsPage = () => {
           key: CategoryEnum.COSMETICS,
           title: (
             <Space className="items-center">
-              <ContentOutline /> Cosmetics
+              <ContentOutline /> Cosmetics{" "}
+              <span>({countItemCosmeticsQuery.data})</span>
             </Space>
           ),
         },
@@ -42,7 +69,8 @@ const ItemsPage = () => {
           key: CategoryEnum.OTHERS,
           title: (
             <Space className="items-center">
-              <FolderOutline /> Others
+              <FolderOutline /> Others{" "}
+              <span>({countItemOthersQuery.data})</span>
             </Space>
           ),
         },

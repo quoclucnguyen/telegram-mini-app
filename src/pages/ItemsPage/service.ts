@@ -110,3 +110,21 @@ export const useAteItemCategoryFoodMutation = () => {
     },
   });
 };
+
+export const useCountItemsByCategoryQuery = (
+  category: CategoryEnum,
+  enabled?: boolean,
+) => {
+  return useQuery({
+    queryKey: ["countItemsByCategory", category],
+    queryFn: async () => {
+      const result = await supabase
+        .from("item")
+        .select("*", { count: "exact", head: true })
+        .eq("category", category);
+
+      return result.count;
+    },
+    enabled,
+  });
+};
