@@ -14,7 +14,7 @@ import {
   Space,
   SwipeAction,
 } from "antd-mobile";
-import { CloseOutline, DeleteOutline } from "antd-mobile-icons";
+import { CloseOutline, DeleteOutline, EditSOutline } from "antd-mobile-icons";
 import dayjs from "dayjs";
 import {
   useCallback,
@@ -119,10 +119,22 @@ export const ListItem = ({ item, deleteCb }: ItemProps) => {
     await ateItemCategoryFoodMutation.mutateAsync(id);
   }, [ateItemCategoryFoodMutation, id]);
 
+  const actionEditClick = useCallback(() => {}, []);
+
   return (
     <>
       <SwipeAction
         rightActions={[
+          {
+            key: "edit",
+            text: (
+              <Space className="items-center">
+                <EditSOutline /> Edit
+              </Space>
+            ),
+            color: "light",
+            onClick: actionEditClick,
+          },
           {
             key: "delete",
             text: (

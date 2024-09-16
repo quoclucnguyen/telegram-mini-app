@@ -26,6 +26,7 @@ interface ItemPopupProps {
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
   cb: () => void;
   category: CategoryEnum;
+  title?: string;
 }
 
 const ItemPopup = ({
@@ -33,6 +34,7 @@ const ItemPopup = ({
   setOpenModal,
   cb,
   category,
+  title = "Create Item",
 }: ItemPopupProps) => {
   const [form] = Form.useForm();
   const [imageUploadFile, setImageUploadFile] = useState<File | undefined>();
@@ -156,6 +158,7 @@ const ItemPopup = ({
   return (
     <Popup visible={openModal} onMaskClick={() => setOpenModal(false)}>
       <div style={{ height: "60vh", overflowY: "scroll" }}>
+        <div className="pl-4 my-4 text-lg">{title}</div>
         <Form layout="vertical" form={form} onFinish={formSubmit}>
           <Form.Item label="Name" name="name" rules={[{ required: true }]}>
             <Input />
