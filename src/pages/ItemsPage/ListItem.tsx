@@ -86,6 +86,10 @@ export const ListItem = ({ item, deleteCb }: ItemProps) => {
   }, [remainingTime]);
 
   const badgeConent = useMemo(() => {
+    if (remainingTime > 2592000) {
+      return `${Math.floor(remainingTime / 2592000)}m`;
+    }
+
     if (remainingTime >= 86400) {
       const days = Math.floor(remainingTime / 86400);
       return `${days}d`;
