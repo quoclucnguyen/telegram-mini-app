@@ -89,6 +89,7 @@ export type Database = {
           note: string | null;
           path: string | null;
           status: Database["public"]["Enums"]["item_status_enum"] | null;
+          type: Database["public"]["Enums"]["item_type_enum"] | null;
           updated_at: string | null;
         };
         Insert: {
@@ -103,6 +104,7 @@ export type Database = {
           note?: string | null;
           path?: string | null;
           status?: Database["public"]["Enums"]["item_status_enum"] | null;
+          type?: Database["public"]["Enums"]["item_type_enum"] | null;
           updated_at?: string | null;
         };
         Update: {
@@ -117,6 +119,7 @@ export type Database = {
           note?: string | null;
           path?: string | null;
           status?: Database["public"]["Enums"]["item_status_enum"] | null;
+          type?: Database["public"]["Enums"]["item_type_enum"] | null;
           updated_at?: string | null;
         };
         Relationships: [];
@@ -158,6 +161,7 @@ export type Database = {
     Enums: {
       item_category_enum: "foods" | "cosmetics" | "others";
       item_status_enum: "out_date" | "ate";
+      item_type_enum: "vegetable_fruit" | "fresh_meat";
       location_enum: "dry" | "wet" | "refrigerator" | "freezer";
     };
     CompositeTypes: {
