@@ -1,6 +1,7 @@
 export interface FormFields {
   name: string;
-  location?: ("dry" | "wet" | "refrigerator" | "freezer")[];
+  location?: LocationEnum[];
+  type?: ItemTypeEnum[];
   description: string;
   note: string;
   expiredAt: string;
@@ -13,6 +14,18 @@ export enum CategoryEnum {
   OTHERS = "others",
 }
 
+export enum ItemTypeEnum {
+  VEGETABLE_FRUIT = "vegetable_fruit",
+  FRESH_MEAT = "fresh_meat",
+}
+
+export enum LocationEnum {
+  DRY = "dry",
+  WET = "wet",
+  REFRIGERATOR = "refrigerator",
+  FREEZER = "freezer",
+}
+
 export interface ItemInterface {
   description: string | null;
   name: string;
@@ -20,8 +33,9 @@ export interface ItemInterface {
   path: string | null;
   id: number;
   status: "out_date" | "ate" | null;
-  location?: "dry" | "wet" | "refrigerator" | "freezer";
+  location?: LocationEnum;
   note: string | null;
   expired_at: string | null;
   category: CategoryEnum | null;
+  type: ItemTypeEnum | null;
 }

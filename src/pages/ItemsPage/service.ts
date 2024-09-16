@@ -2,7 +2,7 @@ import { supabase } from "@/supabase";
 import { QueryData } from "@supabase/supabase-js";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { CategoryEnum } from "./interface";
+import { CategoryEnum, ItemTypeEnum, LocationEnum } from "./interface";
 
 export const useItemsQuery = (take = 5, offset = 0) => {
   return useQuery({
@@ -33,7 +33,8 @@ export const useCreateItemMutation = () => {
     mutationKey: ["createItem"],
     mutationFn: async (data: {
       name: string;
-      location: "dry" | "wet" | "refrigerator" | "freezer";
+      location: LocationEnum;
+      type?: ItemTypeEnum;
       description?: string;
       note?: string;
       bucket?: string;
@@ -201,4 +202,15 @@ export const useCountItemsByCategoryByExpiredAtQuery = (
       return result.count;
     },
   });
+};
+
+export const itemTypeToDate = (type: ItemTypeEnum) => {
+  if (type === ItemTypeEnum.VEGETABLE_FRUIT) {
+    return dayjs().add(7, "day").toDate();
+  }
+  if (type === ItemTypeEnum.FRESH_MEAT) {
+    return dayjs().add(7, "day").toDate();
+  }
+
+  return dayjs().toDate();
 };

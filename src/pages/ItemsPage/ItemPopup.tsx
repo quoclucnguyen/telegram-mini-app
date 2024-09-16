@@ -13,8 +13,13 @@ import {
 import dayjs from "dayjs";
 import pica from "pica";
 import { useCallback, useState } from "react";
-import { CategoryEnum, FormFields } from "./interface";
-import { useCreateItemMutation } from "./service";
+import {
+  CategoryEnum,
+  FormFields,
+  ItemTypeEnum,
+  LocationEnum,
+} from "./interface";
+import { itemTypeToDate, useCreateItemMutation } from "./service";
 
 interface ItemPopupProps {
   openModal: boolean;
@@ -85,9 +90,13 @@ const ItemPopup = ({
 
   const formSubmit = useCallback(
     async (values: FormFields) => {
+      console.log(values);
+
       delete values.file;
-      const location = values.location?.[0] ?? "dry";
+      const location = values.location?.[0] ?? LocationEnum.DRY;
       delete values.location;
+      const type = values.type?.[0] ?? undefined;
+      delete values.type;
 
       const bucket = "items";
       let path = undefined;
@@ -115,6 +124,7 @@ const ItemPopup = ({
         bucket,
         path,
         category,
+        type,
         expired_at: expiredAt
           ? dayjs(expiredAt)
               .set("hour", 23)
@@ -151,6 +161,22 @@ const ItemPopup = ({
             <Input />
           </Form.Item>
 
+          {category === CategoryEnum.FOODS && (
+            <Form.Item label="Type" name="type">
+              <Selector
+                options={Object.values(ItemTypeEnum).map((value) => {
+                  return { label: value, value };
+                })}
+                onChange={(values) => {
+                  if (values[0]) {
+                    setExpiredAt(itemTypeToDate(values[0]));
+                    form.setFieldValue("location", [LocationEnum.REFRIGERATOR]);
+                  }
+                }}
+              />
+            </Form.Item>
+          )}
+
           <Form.Item
             label="Location"
             name="location"
@@ -161,11 +187,9 @@ const ItemPopup = ({
             ]}
           >
             <Selector
-              options={["dry", "wet", "refrigerator", "freezer"].map(
-                (value) => {
-                  return { label: value, value };
-                },
-              )}
+              options={Object.values(LocationEnum).map((value) => {
+                return { label: value, value };
+              })}
             />
           </Form.Item>
 
@@ -189,30 +213,35 @@ const ItemPopup = ({
             />
           </Form.Item>
 
-          <Form.Item
-            label="Expired at"
-            onClick={() => setCalendarPickerVisible(true)}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input
-              disabled
-              value={expiredAt ? dayjs(expiredAt).format("DD/MM/YYYY") : ""}
-            />
+          {category === CategoryEnum.FOODS && (
+            <Form.Item
+              label="Expired at"
+              onClick={() => setCalendarPickerVisible(true)}
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+            >
+              <Input
+                disabled
+                value={expiredAt ? dayjs(expiredAt).format("DD/MM/YYYY") : ""}
+              />
 
-            <CalendarPicker
-              visible={calendarPickerVisible}
-              selectionMode="single"
-              onClose={() => setCalendarPickerVisible(false)}
-              onMaskClick={() => setCalendarPickerVisible(false)}
-              onChange={(val) => {
-                setExpiredAt(dayjs(val ?? null).toDate());
-              }}
-            />
-          </Form.Item>
+              <CalendarPicker
+                visible={calendarPickerVisible}
+                selectionMode="single"
+                onClose={() => setCalendarPickerVisible(false)}
+                onMaskClick={() => setCalendarPickerVisible(false)}
+                onChange={(val) => {
+                  setExpiredAt(dayjs(val ?? null).toDate());
+                }}
+                min={dayjs().toDate()}
+                max={dayjs().add(6, "months").toDate()}
+                value={expiredAt}
+              />
+            </Form.Item>
+          )}
 
           <Form.Item>
             <Button
