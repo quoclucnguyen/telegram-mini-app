@@ -1,7 +1,7 @@
 export interface FormFields {
   name: string;
   location?: LocationEnum[];
-  type?: ItemTypeEnum[];
+  type?: ItemTypeEnum[] | undefined;
   description: string;
   note: string;
   expiredAt: string;

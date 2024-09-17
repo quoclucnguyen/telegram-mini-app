@@ -27,9 +27,10 @@ import {
 interface ItemProps {
   deleteCb?: () => void;
   item: ItemInterface;
+  onEdit: () => void;
 }
 
-export const ListItem = ({ item, deleteCb }: ItemProps) => {
+export const ListItem = ({ item, deleteCb, onEdit }: ItemProps) => {
   const { description, name, bucket, path, id, expired_at, location, note } =
     item;
   const [imageUrl, setImageUrl] = useState("");
@@ -63,6 +64,14 @@ export const ListItem = ({ item, deleteCb }: ItemProps) => {
       ),
     });
   }, [deleteCb, deleteItemMutation, id]);
+
+  const actionEditClick = useCallback(() => {
+    onEdit();
+  }, [onEdit]);
+
+  const actionAteClick = useCallback(async () => {
+    await ateItemCategoryFoodMutation.mutateAsync(id);
+  }, [ateItemCategoryFoodMutation, id]);
 
   const getSignedUrl = useCallback(async () => {
     if (!bucket || !path) return;
@@ -114,12 +123,6 @@ export const ListItem = ({ item, deleteCb }: ItemProps) => {
       (description ? ` - ${description}` : "")
     );
   }, [description, expired_at, note]);
-
-  const actionAteClick = useCallback(async () => {
-    await ateItemCategoryFoodMutation.mutateAsync(id);
-  }, [ateItemCategoryFoodMutation, id]);
-
-  const actionEditClick = useCallback(() => {}, []);
 
   return (
     <>

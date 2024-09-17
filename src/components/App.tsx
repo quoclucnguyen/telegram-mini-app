@@ -1,4 +1,3 @@
-import ItemsPage from "@/pages/ItemsPage/ItemsPage";
 import { useIntegration } from "@telegram-apps/react-router-integration";
 import {
   bindMiniAppCSSVars,
@@ -13,8 +12,16 @@ import {
 import { AppRoot } from "@telegram-apps/telegram-ui";
 import { ConfigProvider } from "antd-mobile";
 import enUS from "antd-mobile/es/locales/en-US";
-import { type FC, useEffect, useLayoutEffect, useMemo } from "react";
+import React, {
+  type FC,
+  lazy,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+} from "react";
 import { Route, Router, Routes } from "react-router-dom";
+
+const ItemsPage = lazy(() => import("@/pages/ItemsPage/ItemsPage"));
 
 export const App: FC = () => {
   const lp = useLaunchParams();
@@ -60,9 +67,11 @@ export const App: FC = () => {
     >
       <ConfigProvider locale={enUS}>
         <Router location={location} navigator={reactNavigator}>
-          <Routes>
-            <Route path="*" element={<ItemsPage />} />
-          </Routes>
+          <React.Suspense>
+            <Routes>
+              <Route path="*" element={<ItemsPage />} />
+            </Routes>
+          </React.Suspense>
         </Router>
       </ConfigProvider>
     </AppRoot>

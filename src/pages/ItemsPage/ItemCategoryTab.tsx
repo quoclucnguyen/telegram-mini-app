@@ -1,5 +1,6 @@
 import {
   FloatingBubble,
+  Form,
   Grid,
   InfiniteScroll,
   List,
@@ -7,9 +8,15 @@ import {
   Tag,
 } from "antd-mobile";
 import { AddCircleOutline } from "antd-mobile-icons";
+import dayjs from "dayjs";
 import { useCallback, useEffect, useState } from "react";
 import { useCategoryTabFilterStore } from "./hook";
-import { CategoryEnum, ItemInterface } from "./interface";
+import {
+  CategoryEnum,
+  FormFields,
+  ItemInterface,
+  LocationEnum,
+} from "./interface";
 import ItemPopup from "./ItemPopup";
 import { ListItem } from "./ListItem";
 import {
@@ -33,6 +40,10 @@ const ItemsPageCategoryTab = ({
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
   const { filter } = useCategoryTabFilterStore();
+  const [action, setAction] = useState<"create" | "edit" | undefined>(
+    undefined,
+  );
+  const [form] = Form.useForm<FormFields>();
 
   const countGoodQuery = useCountItemsByCategoryByExpiredAtQuery(
     category,
@@ -140,6 +151,20 @@ const ItemsPageCategoryTab = ({
                     popupSubmitCb();
                   }}
                   item={item}
+                  onEdit={() => {
+                    console.log(item);
+
+                    setAction("edit");
+                    setOpenModal(true);
+                    form.setFieldsValue({
+                      name: item.name,
+                      description: item.description ?? "",
+                      note: item.note ?? "",
+                      location: [item.location ?? LocationEnum.DRY],
+                      type: item.type ? [item.type] : undefined,
+                      expiredAt: dayjs(item.expired_at).format("YYYY-MM-DD"),
+                    });
+                  }}
                 />
               );
             })
@@ -159,6 +184,8 @@ const ItemsPageCategoryTab = ({
         openModal={openModal}
         setOpenModal={setOpenModal}
         category={category}
+        action={action}
+        form={form}
       />
 
       <FloatingBubble

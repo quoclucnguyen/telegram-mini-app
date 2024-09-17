@@ -11,7 +11,7 @@ export const useItemsQuery = (take = 5, offset = 0) => {
       const itemsQuery = supabase
         .from("item")
         .select(
-          `id, name, location, bucket, path, expired_at, description, note, status`,
+          `id, name, location, bucket, path, expired_at, description, note, status, type`,
         )
         .order("expired_at", { ascending: true })
         .range(offset, offset + take - 1);
@@ -74,7 +74,7 @@ export const useGetItemsMutation = (category: CategoryEnum) => {
       const itemsQuery = supabase
         .from("item")
         .select(
-          `id, name, location, bucket, path, expired_at, description, note, status, category`,
+          `id, name, location, bucket, path, expired_at, description, note, status, category, type`,
         )
         .eq("category", category)
         .or(

@@ -10,9 +10,11 @@ import {
   TextArea,
   Toast,
 } from "antd-mobile";
+
 import dayjs from "dayjs";
 import pica from "pica";
-import { useCallback, useState } from "react";
+import { FormInstance } from "rc-field-form/es/index";
+import { useCallback, useEffect, useState } from "react";
 import {
   CategoryEnum,
   FormFields,
@@ -27,6 +29,9 @@ interface ItemPopupProps {
   cb: () => void;
   category: CategoryEnum;
   title?: string;
+  action?: "create" | "edit";
+  form: FormInstance;
+  initExpiredAt?: Date;
 }
 
 const ItemPopup = ({
@@ -35,8 +40,10 @@ const ItemPopup = ({
   cb,
   category,
   title = "Create Item",
+  action,
+  form,
+  initExpiredAt,
 }: ItemPopupProps) => {
-  const [form] = Form.useForm();
   const [imageUploadFile, setImageUploadFile] = useState<File | undefined>();
   const [calendarPickerVisible, setCalendarPickerVisible] =
     useState<boolean>(false);
@@ -155,6 +162,12 @@ const ItemPopup = ({
     ],
   );
 
+  useEffect(() => {
+    if (action === "edit") {
+      setExpiredAt(initExpiredAt);
+    }
+  }, [action, initExpiredAt]);
+
   return (
     <Popup visible={openModal} onMaskClick={() => setOpenModal(false)}>
       <div style={{ height: "60vh", overflowY: "scroll" }}>
@@ -253,7 +266,7 @@ const ItemPopup = ({
               onClick={() => form.submit()}
               loading={createItemMutation.isPending}
             >
-              Submit
+              Save
             </Button>
           </Form.Item>
         </Form>
