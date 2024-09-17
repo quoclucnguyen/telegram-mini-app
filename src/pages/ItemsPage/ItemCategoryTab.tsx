@@ -1,6 +1,5 @@
 import {
   FloatingBubble,
-  Form,
   Grid,
   InfiniteScroll,
   List,
@@ -8,15 +7,9 @@ import {
   Tag,
 } from "antd-mobile";
 import { AddCircleOutline } from "antd-mobile-icons";
-import dayjs from "dayjs";
 import { useCallback, useEffect, useState } from "react";
 import { useCategoryTabFilterStore } from "./hook";
-import {
-  CategoryEnum,
-  FormFields,
-  ItemInterface,
-  LocationEnum,
-} from "./interface";
+import { CategoryEnum, ItemInterface } from "./interface";
 import ItemPopup from "./ItemPopup";
 import { ListItem } from "./ListItem";
 import {
@@ -43,8 +36,8 @@ const ItemsPageCategoryTab = ({
   const [action, setAction] = useState<"create" | "edit" | undefined>(
     undefined,
   );
-  const [form] = Form.useForm<FormFields>();
-  const [initExpiredAt, setInitExpiredAt] = useState<Date | undefined>(
+
+  const [selectedItem, setSelectedItem] = useState<ItemInterface | undefined>(
     undefined,
   );
 
@@ -159,15 +152,7 @@ const ItemsPageCategoryTab = ({
 
                     setAction("edit");
                     setOpenModal(true);
-                    form.setFieldsValue({
-                      name: item.name,
-                      description: item.description ?? "",
-                      note: item.note ?? "",
-                      location: [item.location ?? LocationEnum.DRY],
-                      type: item.type ? [item.type] : undefined,
-                      expiredAt: dayjs(item.expired_at).format("YYYY-MM-DD"),
-                    });
-                    setInitExpiredAt(dayjs(item.expired_at).toDate());
+                    setSelectedItem(item);
                   }}
                 />
               );
@@ -189,8 +174,7 @@ const ItemsPageCategoryTab = ({
         setOpenModal={setOpenModal}
         category={category}
         action={action}
-        form={form}
-        initExpiredAt={initExpiredAt}
+        selectedItem={selectedItem}
       />
 
       <FloatingBubble

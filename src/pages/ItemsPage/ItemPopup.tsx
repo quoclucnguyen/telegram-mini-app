@@ -4,6 +4,7 @@ import {
   CalendarPicker,
   Form,
   ImageUploader,
+  ImageUploadItem,
   Input,
   Popup,
   Selector,
@@ -11,13 +12,14 @@ import {
   Toast,
 } from "antd-mobile";
 
+import { createSignedUrl } from "@/common/storage";
 import dayjs from "dayjs";
 import pica from "pica";
-import { FormInstance } from "rc-field-form/es/index";
 import { useCallback, useEffect, useState } from "react";
 import {
   CategoryEnum,
   FormFields,
+  ItemInterface,
   ItemTypeEnum,
   LocationEnum,
 } from "./interface";
@@ -30,8 +32,7 @@ interface ItemPopupProps {
   category: CategoryEnum;
   title?: string;
   action?: "create" | "edit";
-  form: FormInstance;
-  initExpiredAt?: Date;
+  selectedItem?: ItemInterface;
 }
 
 const ItemPopup = ({
@@ -41,13 +42,14 @@ const ItemPopup = ({
   category,
   title = "Create Item",
   action,
-  form,
-  initExpiredAt,
+  selectedItem,
 }: ItemPopupProps) => {
   const [imageUploadFile, setImageUploadFile] = useState<File | undefined>();
   const [calendarPickerVisible, setCalendarPickerVisible] =
     useState<boolean>(false);
   const [expiredAt, setExpiredAt] = useState<Date | undefined>(undefined);
+  const [form] = Form.useForm<FormFields>();
+  const [fileList, setFileList] = useState<ImageUploadItem[]>([]);
 
   const createItemMutation = useCreateItemMutation();
 
@@ -163,25 +165,57 @@ const ItemPopup = ({
   );
 
   useEffect(() => {
-    if (action === "edit") {
-      setExpiredAt(initExpiredAt);
+    if (action === "edit" && selectedItem) {
+      const {
+        name,
+        description,
+        note,
+        location,
+        type,
+        expired_at,
+        bucket,
+        path,
+      } = selectedItem;
+      form.setFieldsValue({
+        name: name,
+        description: description ?? "",
+        note: note ?? "",
+        location: [location ?? LocationEnum.DRY],
+        type: type ? [type] : undefined,
+      });
+      setExpiredAt(expired_at ? new Date(expired_at) : undefined);
+
+      if (bucket && path) {
+        createSignedUrl(bucket, path).then((url) => {
+          setFileList([
+            {
+              url,
+            },
+          ]);
+        });
+      } else {
+        setFileList([]);
+      }
     }
-  }, [action, initExpiredAt]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [action, selectedItem]);
 
   return (
     <Popup visible={openModal} onMaskClick={() => setOpenModal(false)}>
       <div style={{ height: "60vh", overflowY: "scroll" }}>
         <div className="pl-4 my-4 text-lg">{title}</div>
         <Form layout="vertical" form={form} onFinish={formSubmit}>
-          <Form.Item label="Image" name={"file"}>
+          <Form.Item label="Image">
             <ImageUploader
-              maxCount={1}
               upload={async (file: File) => {
                 setImageUploadFile(file);
                 return {
                   url: URL.createObjectURL(file),
                 };
               }}
+              value={fileList}
+              onChange={setFileList}
             />
           </Form.Item>
 
