@@ -160,6 +160,18 @@ const ItemPopup = ({
       <div style={{ height: "60vh", overflowY: "scroll" }}>
         <div className="pl-4 my-4 text-lg">{title}</div>
         <Form layout="vertical" form={form} onFinish={formSubmit}>
+          <Form.Item label="Image" name={"file"}>
+            <ImageUploader
+              maxCount={1}
+              upload={async (file: File) => {
+                setImageUploadFile(file);
+                return {
+                  url: URL.createObjectURL(file),
+                };
+              }}
+            />
+          </Form.Item>
+
           <Form.Item label="Name" name="name" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
@@ -204,18 +216,6 @@ const ItemPopup = ({
             <TextArea />
           </Form.Item>
 
-          <Form.Item label="Image" name={"file"}>
-            <ImageUploader
-              maxCount={1}
-              upload={async (file: File) => {
-                setImageUploadFile(file);
-                return {
-                  url: URL.createObjectURL(file),
-                };
-              }}
-            />
-          </Form.Item>
-
           {category === CategoryEnum.FOODS && (
             <Form.Item
               label="Expired at"
@@ -240,7 +240,7 @@ const ItemPopup = ({
                   setExpiredAt(dayjs(val ?? null).toDate());
                 }}
                 min={dayjs().toDate()}
-                max={dayjs().add(6, "months").toDate()}
+                max={dayjs().add(12, "months").toDate()}
                 value={expiredAt}
               />
             </Form.Item>
