@@ -44,6 +44,9 @@ const ItemsPageCategoryTab = ({
     undefined,
   );
   const [form] = Form.useForm<FormFields>();
+  const [initExpiredAt, setInitExpiredAt] = useState<Date | undefined>(
+    undefined,
+  );
 
   const countGoodQuery = useCountItemsByCategoryByExpiredAtQuery(
     category,
@@ -164,6 +167,7 @@ const ItemsPageCategoryTab = ({
                       type: item.type ? [item.type] : undefined,
                       expiredAt: dayjs(item.expired_at).format("YYYY-MM-DD"),
                     });
+                    setInitExpiredAt(dayjs(item.expired_at).toDate());
                   }}
                 />
               );
@@ -186,6 +190,7 @@ const ItemsPageCategoryTab = ({
         category={category}
         action={action}
         form={form}
+        initExpiredAt={initExpiredAt}
       />
 
       <FloatingBubble

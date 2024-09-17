@@ -10,6 +10,7 @@ import {
   useViewport,
 } from "@telegram-apps/sdk-react";
 import { AppRoot } from "@telegram-apps/telegram-ui";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { ConfigProvider } from "antd-mobile";
 import enUS from "antd-mobile/es/locales/en-US";
 import React, {
@@ -74,6 +75,7 @@ export const App: FC = () => {
           </React.Suspense>
         </Router>
       </ConfigProvider>
+      <SpeedInsights />
     </AppRoot>
   );
 };

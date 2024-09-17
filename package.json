@@ -19,6 +19,7 @@
     "@telegram-apps/react-router-integration": "^1.0.0",
     "@telegram-apps/sdk-react": "^1.0.0",
     "@telegram-apps/telegram-ui": "^2.1.5",
+    "@vercel/speed-insights": "^1.0.12",
     "antd-mobile": "^5.37.1",
     "antd-mobile-icons": "^0.3.0",
     "dayjs": "^1.11.13",
