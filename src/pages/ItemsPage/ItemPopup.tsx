@@ -2,6 +2,7 @@ import { uploadFile } from "@/common/helper";
 import {
   Button,
   CalendarPicker,
+  DatePicker,
   Form,
   ImageUploader,
   ImageUploadItem,
@@ -20,17 +21,16 @@ import {
   CategoryEnum,
   FormFields,
   ItemInterface,
-  ItemTypeEnum,
   LocationEnum,
+  QUICK_DATE_ENUM,
 } from "./interface";
-import { itemTypeToDate, useCreateItemMutation } from "./service";
+import { useCreateItemMutation } from "./service";
 
 interface ItemPopupProps {
   openModal: boolean;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
   cb: () => void;
   category: CategoryEnum;
-  title?: string;
   action?: "create" | "edit";
   selectedItem?: ItemInterface;
 }
@@ -40,7 +40,6 @@ const ItemPopup = ({
   setOpenModal,
   cb,
   category,
-  title = "Create Item",
   action,
   selectedItem,
 }: ItemPopupProps) => {
@@ -204,7 +203,9 @@ const ItemPopup = ({
   return (
     <Popup visible={openModal} onMaskClick={() => setOpenModal(false)}>
       <div style={{ height: "60vh", overflowY: "scroll" }}>
-        <div className="pl-4 my-4 text-lg">{title}</div>
+        <div className="pl-4 my-4 text-lg">
+          {action === "create" ? "Create Item" : "Edit Item"}
+        </div>
         <Form layout="vertical" form={form} onFinish={formSubmit}>
           <Form.Item label="Image">
             <ImageUploader
@@ -222,22 +223,6 @@ const ItemPopup = ({
           <Form.Item label="Name" name="name" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-
-          {category === CategoryEnum.FOODS && (
-            <Form.Item label="Type" name="type">
-              <Selector
-                options={Object.values(ItemTypeEnum).map((value) => {
-                  return { label: value, value };
-                })}
-                onChange={(values) => {
-                  if (values[0]) {
-                    setExpiredAt(itemTypeToDate(values[0]));
-                    form.setFieldValue("location", [LocationEnum.REFRIGERATOR]);
-                  }
-                }}
-              />
-            </Form.Item>
-          )}
 
           <Form.Item
             label="Location"
@@ -263,6 +248,44 @@ const ItemPopup = ({
             <TextArea />
           </Form.Item>
 
+          <Form.Item label="" name="">
+            <Selector
+              options={Object.values(QUICK_DATE_ENUM).map((value) => {
+                return { label: value, value };
+              })}
+              onChange={(values: QUICK_DATE_ENUM[]) => {
+                if (values[0]) {
+                  switch (values[0]) {
+                    case QUICK_DATE_ENUM["1d"]:
+                      setExpiredAt(dayjs().add(1, "day").toDate());
+                      break;
+                    case QUICK_DATE_ENUM["3d"]:
+                      setExpiredAt(dayjs().add(3, "day").toDate());
+                      break;
+                    case QUICK_DATE_ENUM["1w"]:
+                      setExpiredAt(dayjs().add(7, "day").toDate());
+                      break;
+                    case QUICK_DATE_ENUM["1m"]:
+                      setExpiredAt(dayjs().add(1, "month").toDate());
+                      break;
+                    case QUICK_DATE_ENUM["3m"]:
+                      setExpiredAt(dayjs().add(3, "month").toDate());
+                      break;
+                    case QUICK_DATE_ENUM["6m"]:
+                      setExpiredAt(dayjs().add(6, "month").toDate());
+                      break;
+                    case QUICK_DATE_ENUM["1y"]:
+                      setExpiredAt(dayjs().add(1, "year").toDate());
+                      break;
+                    case QUICK_DATE_ENUM["2y"]:
+                      setExpiredAt(dayjs().add(2, "year").toDate());
+                      break;
+                  }
+                }
+              }}
+            />
+          </Form.Item>
+
           {category === CategoryEnum.FOODS && (
             <Form.Item
               label="Expired at"
@@ -283,13 +306,37 @@ const ItemPopup = ({
                 selectionMode="single"
                 onClose={() => setCalendarPickerVisible(false)}
                 onMaskClick={() => setCalendarPickerVisible(false)}
-                onChange={(val) => {
+                onConfirm={(val) => {
                   setExpiredAt(dayjs(val ?? null).toDate());
                 }}
                 min={dayjs().toDate()}
                 max={dayjs().add(12, "months").toDate()}
                 value={expiredAt}
               />
+            </Form.Item>
+          )}
+
+          {category !== CategoryEnum.FOODS && (
+            <Form.Item
+              label="Expired at"
+              onClick={() => {
+                setCalendarPickerVisible(true);
+              }}
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+            >
+              <DatePicker
+                visible={calendarPickerVisible}
+                onClose={() => setCalendarPickerVisible(false)}
+                onConfirm={(val) => {
+                  setExpiredAt(dayjs(val ?? null).toDate());
+                }}
+              >
+                {() => (expiredAt ? dayjs(expiredAt).format("YYYY-MM-DD") : "")}
+              </DatePicker>
             </Form.Item>
           )}
 
