@@ -49,6 +49,7 @@ const ItemPopup = ({
   const [expiredAt, setExpiredAt] = useState<Date | undefined>(undefined);
   const [form] = Form.useForm<FormFields>();
   const [fileList, setFileList] = useState<ImageUploadItem[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const createItemMutation = useCreateItemMutation();
 
@@ -100,56 +101,65 @@ const ItemPopup = ({
 
   const formSubmit = useCallback(
     async (values: FormFields) => {
-      console.log(values);
+      setLoading(true);
+      try {
+        delete values.file;
+        const location = values.location?.[0] ?? LocationEnum.DRY;
+        delete values.location;
+        const type = values.type?.[0] ?? undefined;
+        delete values.type;
 
-      delete values.file;
-      const location = values.location?.[0] ?? LocationEnum.DRY;
-      delete values.location;
-      const type = values.type?.[0] ?? undefined;
-      delete values.type;
+        const bucket = "items";
+        let path = undefined;
 
-      const bucket = "items";
-      let path = undefined;
+        if (!expiredAt) {
+          Toast.show("Please select expired date");
+          return;
+        }
 
-      if (!expiredAt) {
-        Toast.show("Please select expired date");
+        if (imageUploadFile) {
+          const { path: resultPath } = await uploadFile(
+            await resizeImage(imageUploadFile),
+            "items",
+            "images",
+          );
+
+          if (resultPath) {
+            path = resultPath;
+          }
+        }
+
+        await createItemMutation.mutateAsync({
+          ...values,
+          location,
+          bucket,
+          path,
+          category,
+          type,
+          expired_at: expiredAt
+            ? dayjs(expiredAt)
+                .set("hour", 23)
+                .set("minute", 59)
+                .set("second", 59)
+                .toISOString()
+            : undefined,
+        });
+
+        form.resetFields();
+        setImageUploadFile(undefined);
+        setOpenModal(false);
+        setExpiredAt(undefined);
+        setFileList([]);
+
+        cb?.();
+
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        Toast.show("Failed to create item");
+        setLoading(false);
         return;
       }
-
-      if (imageUploadFile) {
-        const { path: resultPath } = await uploadFile(
-          await resizeImage(imageUploadFile),
-          "items",
-          "images",
-        );
-
-        if (resultPath) {
-          path = resultPath;
-        }
-      }
-
-      await createItemMutation.mutateAsync({
-        ...values,
-        location,
-        bucket,
-        path,
-        category,
-        type,
-        expired_at: expiredAt
-          ? dayjs(expiredAt)
-              .set("hour", 23)
-              .set("minute", 59)
-              .set("second", 59)
-              .toISOString()
-          : undefined,
-      });
-
-      form.resetFields();
-      setImageUploadFile(undefined);
-      setOpenModal(false);
-      setExpiredAt(undefined);
-
-      cb?.();
     },
     [
       category,
@@ -306,7 +316,7 @@ const ItemPopup = ({
                 selectionMode="single"
                 onClose={() => setCalendarPickerVisible(false)}
                 onMaskClick={() => setCalendarPickerVisible(false)}
-                onConfirm={(val) => {
+                onChange={(val) => {
                   setExpiredAt(dayjs(val ?? null).toDate());
                 }}
                 min={dayjs().toDate()}
@@ -345,7 +355,7 @@ const ItemPopup = ({
               block
               color="primary"
               onClick={() => form.submit()}
-              loading={createItemMutation.isPending}
+              loading={loading}
             >
               Save
             </Button>

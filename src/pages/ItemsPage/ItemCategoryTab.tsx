@@ -1,12 +1,11 @@
 import {
-  FloatingBubble,
+  Button,
   Grid,
   InfiniteScroll,
   List,
   PullToRefresh,
   Tag,
 } from "antd-mobile";
-import { AddCircleOutline } from "antd-mobile-icons";
 import { useCallback, useEffect, useState } from "react";
 import { useCategoryTabFilterStore } from "./hook";
 import { CategoryEnum, ItemInterface } from "./interface";
@@ -79,6 +78,7 @@ const ItemsPageCategoryTab = ({
 
   const onOpen = useCallback(() => {
     setOpenModal(true);
+    setAction("create");
   }, []);
 
   useEffect(() => {
@@ -109,29 +109,58 @@ const ItemsPageCategoryTab = ({
 
   return (
     <>
-      <Grid className="mx-3 my-2 text-center" columns={4}>
+      <Grid className="mx-3 my-2 text-center" columns={5}>
         <Grid.Item>
-          <Tag color="success" fill="outline">
+          <Tag
+            color="success"
+            fill="outline"
+            className="h-[26px] items-center flex mx-1 justify-center"
+          >
             {countGoodQuery.data} good
           </Tag>
         </Grid.Item>
 
         <Grid.Item>
-          <Tag color="warning" fill="outline">
+          <Tag
+            color="warning"
+            fill="outline"
+            className="h-[26px] items-center flex mx-1 justify-center"
+          >
             {countSoonQuery.data} soon
           </Tag>
         </Grid.Item>
 
         <Grid.Item>
-          <Tag color="danger" fill="outline">
+          <Tag
+            color="danger"
+            fill="outline"
+            className="h-[26px] items-center flex mx-1 justify-center"
+          >
             {countTodayQuery.data} today
           </Tag>
         </Grid.Item>
 
         <Grid.Item>
-          <Tag color="default" fill="outline">
+          <Tag
+            color="default"
+            fill="outline"
+            className="h-[26px] items-center flex mx-1 justify-center"
+          >
             {countExpiredQuery.data} expired
           </Tag>
+        </Grid.Item>
+        <Grid.Item>
+          <Button
+            size="mini"
+            type="button"
+            color="primary"
+            onClick={() => {
+              onOpen();
+            }}
+            className="rounded-none"
+          >
+            Add
+          </Button>
         </Grid.Item>
       </Grid>
       <PullToRefresh onRefresh={reset}>
@@ -165,30 +194,20 @@ const ItemsPageCategoryTab = ({
         <InfiniteScroll loadMore={loadMore} hasMore={hasMore} />
       </PullToRefresh>
 
-      <ItemPopup
-        cb={async () => {
-          reset();
-          popupSubmitCb();
-        }}
-        openModal={openModal}
-        setOpenModal={setOpenModal}
-        category={category}
-        action={action}
-        selectedItem={selectedItem}
-      />
-
-      <FloatingBubble
-        style={{
-          "--initial-position-bottom": "10px",
-          "--initial-position-right": "10px",
-          "--edge-distance": "24px",
-        }}
-        onClick={() => {
-          onOpen();
-        }}
-      >
-        <AddCircleOutline fontSize={32} />
-      </FloatingBubble>
+      {openModal && (
+        <ItemPopup
+          cb={async () => {
+            reset();
+            popupSubmitCb();
+            setAction(undefined);
+          }}
+          openModal={openModal}
+          setOpenModal={setOpenModal}
+          category={category}
+          action={action}
+          selectedItem={selectedItem}
+        />
+      )}
     </>
   );
 };
