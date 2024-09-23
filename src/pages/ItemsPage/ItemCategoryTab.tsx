@@ -111,41 +111,25 @@ const ItemsPageCategoryTab = ({
     <>
       <Grid className="mx-3 my-2 text-center" columns={5}>
         <Grid.Item>
-          <Tag
-            color="success"
-            fill="outline"
-            className="h-[26px] items-center flex mx-1 justify-center"
-          >
+          <Tag color="success" fill="outline">
             {countGoodQuery.data} good
           </Tag>
         </Grid.Item>
 
         <Grid.Item>
-          <Tag
-            color="warning"
-            fill="outline"
-            className="h-[26px] items-center flex mx-1 justify-center"
-          >
+          <Tag color="warning" fill="outline">
             {countSoonQuery.data} soon
           </Tag>
         </Grid.Item>
 
         <Grid.Item>
-          <Tag
-            color="danger"
-            fill="outline"
-            className="h-[26px] items-center flex mx-1 justify-center"
-          >
+          <Tag color="danger" fill="outline">
             {countTodayQuery.data} today
           </Tag>
         </Grid.Item>
 
         <Grid.Item>
-          <Tag
-            color="default"
-            fill="outline"
-            className="h-[26px] items-center flex mx-1 justify-center"
-          >
+          <Tag color="default" fill="outline">
             {countExpiredQuery.data} expired
           </Tag>
         </Grid.Item>
@@ -157,7 +141,6 @@ const ItemsPageCategoryTab = ({
             onClick={() => {
               onOpen();
             }}
-            className="rounded-none"
           >
             Add
           </Button>
