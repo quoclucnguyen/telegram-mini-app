@@ -6,6 +6,7 @@ import {
   PullToRefresh,
   Tag,
 } from "antd-mobile";
+import { AddCircleOutline } from "antd-mobile-icons";
 import { useCallback, useEffect, useState } from "react";
 import { useCategoryTabFilterStore } from "./hook";
 import { CategoryEnum, ItemInterface } from "./interface";
@@ -142,7 +143,7 @@ const ItemsPageCategoryTab = ({
               onOpen();
             }}
           >
-            Add
+            <AddCircleOutline />
           </Button>
         </Grid.Item>
       </Grid>

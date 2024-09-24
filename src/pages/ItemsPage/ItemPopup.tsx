@@ -129,21 +129,23 @@ const ItemPopup = ({
           }
         }
 
-        await createItemMutation.mutateAsync({
-          ...values,
-          location,
-          bucket,
-          path,
-          category,
-          type,
-          expired_at: expiredAt
-            ? dayjs(expiredAt)
-                .set("hour", 23)
-                .set("minute", 59)
-                .set("second", 59)
-                .toISOString()
-            : undefined,
-        });
+        if (action === "create") {
+          await createItemMutation.mutateAsync({
+            ...values,
+            location,
+            bucket,
+            path,
+            category,
+            type,
+            expired_at: expiredAt
+              ? dayjs(expiredAt)
+                  .set("hour", 23)
+                  .set("minute", 59)
+                  .set("second", 59)
+                  .toISOString()
+              : undefined,
+          });
+        }
 
         form.resetFields();
         setImageUploadFile(undefined);
@@ -227,6 +229,7 @@ const ItemPopup = ({
               }}
               value={fileList}
               onChange={setFileList}
+              maxCount={1}
             />
           </Form.Item>
 
