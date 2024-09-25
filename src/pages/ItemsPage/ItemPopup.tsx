@@ -164,6 +164,7 @@ const ItemPopup = ({
       }
     },
     [
+      action,
       category,
       cb,
       createItemMutation,
