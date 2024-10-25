@@ -1,11 +1,10 @@
-import { SDKProvider, useLaunchParams } from "@telegram-apps/sdk-react";
 import { type FC } from "react";
 
 import { App } from "@/components/App.tsx";
 import { ErrorBoundary } from "@/components/ErrorBoundary.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const ErrorBoundaryError: FC<{ error: unknown }> = ({ error }) => {
+function ErrorBoundaryError({ error }: { readonly error: unknown }) {
   const errorString = typeof error === "string" ? error : JSON.stringify(error);
 
   return (
@@ -16,24 +15,14 @@ const ErrorBoundaryError: FC<{ error: unknown }> = ({ error }) => {
       </blockquote>
     </div>
   );
-};
+}
 
 const queryClient = new QueryClient();
 
-const Inner: FC = () => {
-  const debug = useLaunchParams().startParam === "debug";
-
-  return (
-    <SDKProvider acceptCustomStyles debug={debug}>
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-    </SDKProvider>
-  );
-};
-
 export const Root: FC = () => (
   <ErrorBoundary fallback={ErrorBoundaryError}>
-    <Inner />
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
   </ErrorBoundary>
 );
