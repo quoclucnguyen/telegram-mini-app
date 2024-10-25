@@ -39,3 +39,9 @@ export const createSignedUrl = async (bucket: string, path: string) => {
 
   return data?.signedUrl ?? "";
 };
+
+export const getPublicUrl = async (bucket: string, path: string) => {
+  const { data } = await supabase.storage.from(bucket).getPublicUrl(path);
+
+  return data?.publicUrl ?? "";
+};

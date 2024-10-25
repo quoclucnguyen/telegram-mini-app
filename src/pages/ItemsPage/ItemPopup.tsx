@@ -13,7 +13,7 @@ import {
   Toast,
 } from "antd-mobile";
 
-import { createSignedUrl } from "@/common/storage";
+import { getPublicUrl } from "@/common/storage";
 import dayjs from "dayjs";
 import pica from "pica";
 import { useCallback, useEffect, useState } from "react";
@@ -24,7 +24,7 @@ import {
   LocationEnum,
   QUICK_DATE_ENUM,
 } from "./interface";
-import { useCreateItemMutation } from "./service";
+import { useCreateItemMutation, useUpdateItemMutation } from "./service";
 
 interface ItemPopupProps {
   openModal: boolean;
@@ -52,6 +52,7 @@ const ItemPopup = ({
   const [loading, setLoading] = useState(false);
 
   const createItemMutation = useCreateItemMutation();
+  const updateItemMutation = useUpdateItemMutation();
 
   const picaInstance = pica();
 
@@ -147,6 +148,25 @@ const ItemPopup = ({
           });
         }
 
+        if (action === "edit" && selectedItem) {
+          await updateItemMutation.mutateAsync({
+            ...values,
+            id: selectedItem.id,
+            location,
+            bucket,
+            path,
+            category,
+            type,
+            expired_at: expiredAt
+              ? dayjs(expiredAt)
+                  .set("hour", 23)
+                  .set("minute", 59)
+                  .set("second", 59)
+                  .toISOString()
+              : undefined,
+          });
+        }
+
         form.resetFields();
         setImageUploadFile(undefined);
         setOpenModal(false);
@@ -154,13 +174,13 @@ const ItemPopup = ({
         setFileList([]);
 
         cb?.();
-
-        setLoading(false);
       } catch (err) {
         console.error(err);
         Toast.show("Failed to create item");
-        setLoading(false);
+
         return;
+      } finally {
+        setLoading(false);
       }
     },
     [
@@ -172,7 +192,9 @@ const ItemPopup = ({
       form,
       imageUploadFile,
       resizeImage,
+      selectedItem,
       setOpenModal,
+      updateItemMutation,
     ],
   );
 
@@ -198,7 +220,7 @@ const ItemPopup = ({
       setExpiredAt(expired_at ? new Date(expired_at) : undefined);
 
       if (bucket && path) {
-        createSignedUrl(bucket, path).then((url) => {
+        getPublicUrl(bucket, path).then((url) => {
           setFileList([
             {
               url,

@@ -1,5 +1,5 @@
 import { formatTime } from "@/common/helper";
-import { createSignedUrl } from "@/common/storage";
+import { getPublicUrl } from "@/common/storage";
 import { CategoryEnum, ItemInterface } from "@/pages/ItemsPage/interface";
 import {
   useAteItemCategoryFoodMutation,
@@ -75,7 +75,7 @@ export const ListItem = ({ item, deleteCb, onEdit }: ItemProps) => {
 
   const getSignedUrl = useCallback(async () => {
     if (!bucket || !path) return;
-    const url = await createSignedUrl(bucket, path);
+    const url = await getPublicUrl(bucket, path);
     setImageUrl(url);
   }, [bucket, path]);
 
@@ -174,6 +174,7 @@ export const ListItem = ({ item, deleteCb, onEdit }: ItemProps) => {
                 height={40}
                 src={imageUrl}
                 onClick={() => setVisible(true)}
+                alt={imageUrl}
               />
             </Badge>
           }

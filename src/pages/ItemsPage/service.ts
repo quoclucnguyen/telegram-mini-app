@@ -220,15 +220,15 @@ export const useUpdateItemMutation = () => {
     mutationKey: ["updateItem"],
     mutationFn: async (data: {
       id: number;
-      name: string;
-      location: LocationEnum;
+      name?: string;
+      location?: LocationEnum;
       type?: ItemTypeEnum;
       description?: string;
       note?: string;
       bucket?: string;
       path?: string;
       expired_at?: string;
-      category: CategoryEnum;
+      category?: CategoryEnum;
     }) => {
       const res = await supabase.from("item").update(data).eq("id", data.id);
       return res.data;
