@@ -155,14 +155,11 @@ const ItemsPageCategoryTab = ({
                 <ListItem
                   key={item.id}
                   deleteCb={() => {
-                    setData((val) => val.filter((v) => v.id !== item.id));
                     reset();
                     popupSubmitCb();
                   }}
                   item={item}
                   onEdit={() => {
-                    console.log(item);
-
                     setAction("edit");
                     setOpenModal(true);
                     setSelectedItem(item);

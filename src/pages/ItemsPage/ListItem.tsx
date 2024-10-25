@@ -1,5 +1,5 @@
 import { formatTime } from "@/common/helper";
-import { getPublicUrl } from "@/common/storage";
+import { deleteFile, getPublicUrl } from "@/common/storage";
 import { CategoryEnum, ItemInterface } from "@/pages/ItemsPage/interface";
 import {
   useAteItemCategoryFoodMutation,
@@ -50,6 +50,7 @@ export const ListItem = ({ item, deleteCb, onEdit }: ItemProps) => {
       ),
       onConfirm: async () => {
         await deleteItemMutation.mutateAsync(id);
+        if (bucket && path) await deleteFile(bucket, path);
         deleteCb?.();
       },
       confirmText: "Delete",
@@ -63,7 +64,7 @@ export const ListItem = ({ item, deleteCb, onEdit }: ItemProps) => {
         />
       ),
     });
-  }, [deleteCb, deleteItemMutation, id]);
+  }, [bucket, deleteCb, deleteItemMutation, id, path]);
 
   const actionEditClick = useCallback(() => {
     onEdit();
