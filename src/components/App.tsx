@@ -28,7 +28,7 @@ export const App: FC = () => {
       children: [
         {
           index: true,
-          element: <Navigate to="dashboard" />,
+          element: <Navigate to="items" />,
         },
         {
           path: "dashboard",
