@@ -8,7 +8,7 @@ export const DatePickerInput = () => {
   return (
     <Form.Item
       name="birthday"
-      label="带清除图标的时间选择器"
+      label=""
       trigger="onConfirm"
       onClick={() => {
         setPickerVisible(true);
