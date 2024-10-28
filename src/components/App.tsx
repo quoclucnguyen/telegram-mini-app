@@ -27,6 +27,10 @@ export const App: FC = () => {
       element: <MainLayout />,
       children: [
         {
+          index: true,
+          element: <Navigate to="dashboard" />,
+        },
+        {
           path: "dashboard",
           element: <DashboardPage />,
         },
