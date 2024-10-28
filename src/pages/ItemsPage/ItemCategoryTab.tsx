@@ -147,33 +147,35 @@ const ItemsPageCategoryTab = ({
           </Button>
         </Grid.Item>
       </Grid>
-      <PullToRefresh onRefresh={reset}>
-        <List className="w-full">
-          {data.length > 0 ? (
-            data.map((item) => {
-              return (
-                <ListItem
-                  key={item.id}
-                  deleteCb={() => {
-                    reset();
-                    popupSubmitCb();
-                  }}
-                  item={item}
-                  onEdit={() => {
-                    setAction("edit");
-                    setOpenModal(true);
-                    setSelectedItem(item);
-                  }}
-                />
-              );
-            })
-          ) : (
-            <List.Item>No items found</List.Item>
-          )}
-        </List>
+      <div className="h-[calc(100vh-160px)] overflow-y-auto">
+        <PullToRefresh onRefresh={reset}>
+          <List className="w-full">
+            {data.length > 0 ? (
+              data.map((item) => {
+                return (
+                  <ListItem
+                    key={item.id}
+                    deleteCb={() => {
+                      reset();
+                      popupSubmitCb();
+                    }}
+                    item={item}
+                    onEdit={() => {
+                      setAction("edit");
+                      setOpenModal(true);
+                      setSelectedItem(item);
+                    }}
+                  />
+                );
+              })
+            ) : (
+              <List.Item>No items found</List.Item>
+            )}
+          </List>
 
-        <InfiniteScroll loadMore={loadMore} hasMore={hasMore} />
-      </PullToRefresh>
+          <InfiniteScroll loadMore={loadMore} hasMore={hasMore} />
+        </PullToRefresh>
+      </div>
 
       {openModal && (
         <ItemPopup
