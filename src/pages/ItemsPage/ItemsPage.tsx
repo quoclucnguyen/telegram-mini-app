@@ -1,3 +1,4 @@
+import { Page } from "@/components/Page";
 import { SearchBar, Space, Tabs } from "antd-mobile";
 import {
   ContentOutline,
@@ -57,7 +58,7 @@ const ItemsPage = () => {
   };
 
   return (
-    <>
+    <Page>
       <SearchBar
         placeholder="Search"
         style={{ "--border-radius": "0px" }}
@@ -125,7 +126,7 @@ const ItemsPage = () => {
           </Tabs.Tab>
         ))}
       </Tabs>
-    </>
+    </Page>
   );
 };
 
