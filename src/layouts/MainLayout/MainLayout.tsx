@@ -26,8 +26,8 @@ const MainLayout = () => {
       icon: <UnorderedListOutline />,
     },
     {
-      key: "dashboard",
-      title: "Home",
+      key: "lucky",
+      title: "Lucky",
       icon: <AppOutline />,
     },
     {

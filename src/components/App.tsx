@@ -9,6 +9,9 @@ import React, { type FC, lazy, useLayoutEffect } from "react";
 import { createHashRouter, Navigate, RouterProvider } from "react-router-dom";
 
 const ItemsPage = lazy(() => import("@/pages/ItemsPage/ItemsPage"));
+const LuckyWheelPage = lazy(
+  () => import("@/pages/LuckyWheelPage/LuckyWheelPage"),
+);
 
 export const App: FC = () => {
   const lp = useLaunchParams();
@@ -37,6 +40,10 @@ export const App: FC = () => {
         {
           path: "items",
           element: <ItemsPage />,
+        },
+        {
+          path: "lucky",
+          element: <LuckyWheelPage />,
         },
       ],
     },
