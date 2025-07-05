@@ -13,8 +13,6 @@ const MainLayout = () => {
   const location = useLocation();
   const { pathname } = location;
 
-  console.log(pathname);
-
   const setRouteActive = (value: string) => {
     navigate(value);
   };
